@@ -1,4 +1,4 @@
-nonebot2的智能(障)回复插件
+nonebot2的智能(障)回复插件, 避免bot尬场
 
 ~~借鉴~~抄自zhenxun-bot
 
