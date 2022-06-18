@@ -3,7 +3,9 @@ nonebot2的智能(障)回复插件, 避免bot尬场
 ~~借鉴~~抄自zhenxun-bot
 
 安装方式:
+
     nb plugin install nonebot-plugin-smart-reply
+    
     pip install nonebot-plugin-smart-reply
     
 
