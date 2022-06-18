@@ -2,7 +2,10 @@ nonebot2的智能(障)回复插件, 避免bot尬场
 
 ~~借鉴~~抄自zhenxun-bot
 
-
+安装方式:
+    nb plugin install nonebot-plugin-smart-reply
+    pip install nonebot-plugin-smart-reply
+    
 
 艾特bot时回复一些基于词库, 或者qinyunke_api拿到的消息(优先词库, 这个词库有点色情)
 
