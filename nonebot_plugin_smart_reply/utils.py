@@ -6,13 +6,11 @@ try:
     import ujson as json
 except ModuleNotFoundError:
     import json
-from typing import Union
-from nonebot.adapters.onebot.v11 import Message
 from httpx import AsyncClient
 import re
 
-NICKNAME: str = list(nonebot.get_driver().config.nickname)[0]      # bot的nickname,可以换成你自己的
-MASTER: str = list(nonebot.get_driver().config.superusers)[0]      # bot的主人名称,也可以换成你自己的
+Bot_NICKNAME: str = list(nonebot.get_driver().config.nickname)[0]      # bot的nickname,可以换成你自己的
+Bot_MASTER: str = list(nonebot.get_driver().config.superusers)[0]      # bot的主人名称,也可以换成你自己的
 # NICKNAME: str = "Hinata"
 # MASTER: str = "星野日向_Official"
 
@@ -28,7 +26,7 @@ hello__reply = [
     "你好！",
     "哦豁？！",
     "你好！Ov<",
-    f"库库库，呼唤{NICKNAME}做什么呢",
+    f"库库库，呼唤{Bot_NICKNAME}做什么呢",
     "我在呢！",
     "呼呼，叫俺干嘛",
 ]
@@ -43,9 +41,9 @@ poke__reply = [
     "别戳了别戳了再戳就坏了555",
     "我爪巴爪巴，球球别再戳了",
     "你戳你🐎呢？！",
-    f"请不要戳{NICKNAME} >_<",
+    f"请不要戳{Bot_NICKNAME} >_<",
     "放手啦，不给戳QAQ",
-    f"喂(#`O′) 戳{NICKNAME}干嘛！",
+    f"喂(#`O′) 戳{Bot_NICKNAME}干嘛！",
     "戳坏了，赔钱！",
     "戳坏了",
     "嗯……不可以……啦……不要乱戳",
@@ -61,32 +59,18 @@ poke__reply = [
 
 # 从字典里返还消息, 抄(借鉴)的zhenxun-bot
 async def get_chat_result(text: str, nickname: str) -> str:
-    if len(text) < 6:
+    if len(text) < 7:
         keys = AnimeThesaurus.keys()
         for key in keys:
             if text.find(key) != -1:
                 return random.choice(AnimeThesaurus[key]).replace("你", nickname)
-
-# 获取on_message的纯文本消息, 抄(借鉴)的zhenxun-bot
-def get_message_text(data: Union[str, Message]) -> str:
-    result = ""
-    if isinstance(data, str):
-        data = json.loads(data)
-        for msg in data["message"]:
-            if msg["type"] == "text":
-                result += msg["data"]["text"].strip() + " "
-        return result.strip()
-    else:
-        for seg in data["text"]:
-            result += seg.data["text"] + " "
-    return result
 
 # 从qinyunke_api拿到消息
 async def get_reply(url):
     async with AsyncClient() as client:
         response = await client.get(url)
         # 这个api好像问道主人或者他叫什么名字会返回私活,这里replace掉部分
-        res = response.json()["content"].replace("林欣", MASTER).replace("{br}", "\n").replace("贾彦娟", MASTER).replace("周超辉", MASTER).replace("鑫总", MASTER).replace("张鑫", MASTER).replace("菲菲", NICKNAME).replace("dn", MASTER).replace("1938877131", "2749903559").replace("小燕", NICKNAME)
+        res = response.json()["content"].replace("林欣", Bot_MASTER).replace("{br}", "\n").replace("贾彦娟", Bot_MASTER).replace("周超辉", Bot_MASTER).replace("鑫总", Bot_MASTER).replace("张鑫", Bot_MASTER).replace("菲菲", Bot_NICKNAME).replace("dn", Bot_MASTER).replace("1938877131", "2749903559").replace("小燕", Bot_NICKNAME)
         res = re.sub(u"\\{.*?\\}", "", res)
         return res
 
