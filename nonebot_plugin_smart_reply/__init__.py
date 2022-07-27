@@ -5,6 +5,7 @@ from nonebot.adapters.onebot.v11 import (
     Message,
     MessageEvent,
     PokeNotifyEvent,
+    MessageSegment
 )
 from .utils import *
 
@@ -49,6 +50,11 @@ async def _(event: MessageEvent):
 
 @poke_.handle()
 async def _poke_event(event: PokeNotifyEvent):
-    if event.is_tome:        
+    if event.is_tome:
+        # 50%概率回复莲宝的藏话
+        if random.random() < 0.5:
+            await poke_.send(MessageSegment.record(Path(aac_file_path)/random.choice(aac_file_list)))
         # 随机回复poke__reply的内容
-        await poke_.send(message=f"{random.choice(poke__reply)}")
+        else:
+            await poke_.send(message=f"{random.choice(poke__reply)}")
+
