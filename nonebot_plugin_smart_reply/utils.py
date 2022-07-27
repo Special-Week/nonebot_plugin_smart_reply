@@ -14,11 +14,18 @@ Bot_MASTER: str = list(nonebot.get_driver().config.superusers)[0]      # bot的�
 # NICKNAME: str = "Hinata"
 # MASTER: str = "星野日向_Official"
 
+aac_list = open(Path(os.path.join(os.path.dirname(
+    __file__), "resource")) / "data.json", "r", encoding="utf8")
+
 
 # 载入词库(这个词库有点涩)
 AnimeThesaurus = json.load(open(Path(os.path.join(os.path.dirname(
     __file__), "resource")) / "data.json", "r", encoding="utf8"))
 
+
+# 获取全部.aac文件
+aac_file_path = os.path.join(os.path.dirname(__file__), "resource")
+aac_file_list = [item for item in os.listdir(aac_file_path) if item.endswith(".aac")]
 
 
 # hello之类的回复
