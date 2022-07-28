@@ -9,24 +9,22 @@ except ModuleNotFoundError:
 from httpx import AsyncClient
 import re
 
+
 Bot_NICKNAME: str = list(nonebot.get_driver().config.nickname)[0]      # bot的nickname,可以换成你自己的
 Bot_MASTER: str = list(nonebot.get_driver().config.superusers)[0]      # bot的主人名称,也可以换成你自己的
 # NICKNAME: str = "Hinata"
 # MASTER: str = "星野日向_Official"
 
-aac_list = open(Path(os.path.join(os.path.dirname(
-    __file__), "resource")) / "data.json", "r", encoding="utf8")
 
 
 # 载入词库(这个词库有点涩)
 AnimeThesaurus = json.load(open(Path(os.path.join(os.path.dirname(
-    __file__), "resource")) / "data.json", "r", encoding="utf8"))
+    __file__), "resource/json")) / "data.json", "r", encoding="utf8"))
 
 
-# 获取全部.aac文件
-aac_file_path = os.path.join(os.path.dirname(__file__), "resource")
-aac_file_list = [item for item in os.listdir(aac_file_path) if item.endswith(".aac")]
-
+# 获取resource/audio下面的全部文件
+aac_file_path = os.path.join(os.path.dirname(__file__), "resource/audio")
+aac_file_list = os.listdir(aac_file_path)
 
 # hello之类的回复
 hello__reply = [
