@@ -7,6 +7,8 @@ nonebot2的智能(障)回复插件
     
     pip install nonebot-plugin-smart-reply
     
+    Download Zip
+    
 
 艾特bot时回复一些基于词库, 或青云客api或者小爱同学拿到的消息(优先词库, 这个词库有点色情)
 
