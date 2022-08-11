@@ -9,7 +9,10 @@ nonebot2的智能(障)回复插件, 避免bot尬场
     pip install nonebot-plugin-smart-reply
     
 
-艾特bot时回复一些基于词库, 或者qinyunke_api拿到的消息(优先词库, 这个词库有点色情)
+艾特bot时回复一些基于词库, 或青云客api或者小爱同学拿到的消息(优先词库, 这个词库有点色情)
+
+api切换的命令为:
+    智障回复api切换 | ai切换 | api_switch | 智能回复api切换
 
 对戳一戳也有反应(50%概率回复莲宝的藏话, 剩下50%概率回复poke__reply的内容, 需要配置好ffmpeg, 没配置好应该会随机回复poke__reply的内容)
 
