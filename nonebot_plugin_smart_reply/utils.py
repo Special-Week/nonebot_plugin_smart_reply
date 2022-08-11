@@ -71,7 +71,7 @@ async def get_chat_result(text: str, nickname: str) -> str:
                 return random.choice(AnimeThesaurus[key]).replace("你", nickname)
 
 # 从qinyunke_api拿到消息
-async def get_reply(url):
+async def qinyun_reply(url):
     async with AsyncClient() as client:
         response = await client.get(url)
         # 这个api好像问道主人或者他叫什么名字会返回私活,这里replace掉部分
@@ -79,3 +79,9 @@ async def get_reply(url):
         res = re.sub(u"\\{.*?\\}", "", res)
         return res
 
+# 从小爱同学api拿到消息, 这个api私货比较少
+async def xiaoice_reply(url):
+    async with AsyncClient() as client:
+        response = await client.get(url)
+        res = response.json()["text"].replace("小爱", Bot_NICKNAME)
+        return res
