@@ -82,8 +82,8 @@ async def qinyun_reply(url):
 # 从小爱同学api拿到消息, 这个api私货比较少
 async def xiaoice_reply(url):
     async with AsyncClient() as client:
-        response = await client.get(url).text
-        response = res[res.find("{"):res.rfind("}")+1]
-        response = json.loads(res)
-        res = response["text"].replace("小爱", Bot_NICKNAME)
+        res = (await client.get(url)).text
+        res = res[res.find("{"):res.rfind("}")+1]
+        res = json.loads(res)
+        res = res["text"].replace("小爱", Bot_NICKNAME)
         return res
