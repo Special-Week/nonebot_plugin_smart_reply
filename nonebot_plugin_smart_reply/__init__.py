@@ -13,8 +13,8 @@ from loguru import logger
 
 
 # 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
-api_flag = False
-# 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认小爱同学
+api_flag = True
+# 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
 api_switch = on_command("智障回复api切换", aliases={
                         "ai切换", "api_switch","智能回复api切换"}, permission=SUPERUSER, rule=to_me(), block=True)
 # 优先级99, 条件: 艾特bot就触发
