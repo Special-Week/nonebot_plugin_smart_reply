@@ -77,6 +77,8 @@ async def qinyun_reply(url):
         # 这个api好像问道主人或者他叫什么名字会返回私活,这里replace掉部分
         res = response.json()["content"].replace("林欣", Bot_MASTER).replace("{br}", "\n").replace("贾彦娟", Bot_MASTER).replace("周超辉", Bot_MASTER).replace("鑫总", Bot_MASTER).replace("张鑫", Bot_MASTER).replace("菲菲", Bot_NICKNAME).replace("dn", Bot_MASTER).replace("1938877131", "2749903559").replace("小燕", Bot_NICKNAME)
         res = re.sub(u"\\{.*?\\}", "", res)
+        if "taobao" in res:
+            res = Bot_NICKNAME + "暂时听不懂主人说的话呢"
         return res
 
 # 从小爱同学api拿到消息, 这个api私货比较少
