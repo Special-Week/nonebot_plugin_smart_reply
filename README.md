@@ -21,7 +21,11 @@ env配置项:
 小爱同学apiKey的申请步骤:
 
     1. 进入网页 https://apibug.cn/doc/xiaoai.html
-    2. 焯, 我文档写着写着api主页寄了
+    2. 右上角注册登录
+    3. 左边接口列表
+    4. 找到"小爱同学AI"零元购买
+    5. 请求接口中 "&apiKey="后面的值就是你的apiKey, 填在.env内, 
+       假设返回你的请求接口是 "https://apibug.cn/api/xiaoai/?msg=你是谁？&apiKey=bfb41121acd1a17640b01864879e107b", 那么你应该在.env内填入  xiaoai_apikey = "bfb41121acd1a17640b01864879e107b"
 
 
 艾特bot时回复一些基于词库, 或青云客api或者小爱同学(好像这个api寄了)拿到的消息(优先词库, 这个词库有点色情)
