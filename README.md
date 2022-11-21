@@ -24,8 +24,8 @@ env配置项:
     2. 右上角注册登录
     3. 左边接口列表
     4. 找到"小爱同学AI"零元购买
-    5. 请求接口中 "&apiKey="后面的值就是你的apiKey, 填在.env内, 
-       假设返回你的请求接口是 "https://apibug.cn/api/xiaoai/?msg=你是谁？&apiKey=bfb41121acd1a17640b01864879e107b", 那么你应该在.env内填入  xiaoai_apikey = "bfb41121acd1a17640b01864879e107b"
+    5. 请求接口中 "&apiKey="后面的值就是你的apiKey, 填在.env内, 假设返回你的请求接口是 "https://apibug.cn/api/xiaoai/?msg=你是谁？&apiKey=abc1145141919810" 
+       那么你应该在.env内填入:  xiaoai_apikey = "abc1145141919810"
 
 
 艾特bot时回复一些基于词库, 或青云客api或者小爱同学(好像这个api寄了)拿到的消息(优先词库, 这个词库有点色情)
