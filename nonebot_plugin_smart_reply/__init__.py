@@ -16,7 +16,7 @@ from loguru import logger
 api_flag = True
 # 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
 api_switch = on_command("智障回复api切换", aliases={
-                        "ai切换", "api_switch","智能回复api切换"}, permission=SUPERUSER, rule=to_me(), block=True)
+                        "ai切换", "api_switch", "智能回复api切换"}, permission=SUPERUSER, rule=to_me(), block=True)
 # 优先级99, 条件: 艾特bot就触发
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
@@ -62,8 +62,12 @@ async def _(event: MessageEvent):
             message = await qinyun_reply(qinyun_url)
             logger.info("来自青云客的智能回复: " + message)
         else:
-            xiaoai_url = f"https://jintia.jintias.cn/api/xatx.php?msg={msg}"
+            xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={apiKey}"
+            if apiKey == "寄":
+                await ai.finish("小爱同学apiKey未设置, 请联系SUPERUSERS在.env中设置")
             message = await xiaoice_reply(xiaoai_url)
+            if message == "寄":
+                await ai.finish("小爱同学apiKey错误, 请联系SUPERUSERS在.env中重新设置")
             logger.info("来自小爱同学的智能回复: " + message)
         await ai.finish(message=message)
     await ai.finish(Message(result))
