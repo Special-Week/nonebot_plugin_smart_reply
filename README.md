@@ -17,6 +17,13 @@ env配置项:
 | Bot_NICKNAME   | string         |脑积水     |Bot_NICKNAME = "Hinata"                  |      你Bot的称呼                         |
 | Bot_MASTER     | string         |脑积水     |Bot_MASTER = "星野日向_Official"          |      你Bot主人的称呼                     |
 
+
+小爱同学apiKey的申请步骤:
+
+    1. 进入网页 https://apibug.cn/doc/xiaoai.html
+    2. 焯, 我文档写着写着api主页寄了
+
+
 艾特bot时回复一些基于词库, 或青云客api或者小爱同学(好像这个api寄了)拿到的消息(优先词库, 这个词库有点色情)
 
 api切换的命令为:
