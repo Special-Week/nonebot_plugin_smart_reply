@@ -13,7 +13,7 @@ env配置项:
 
 |config          |type            |default    |example                                  |usage                                   |
 |----------------|----------------|-----------|-----------------------------------------|----------------------------------------|
-| xiaoai_apikey  | string         |寄         |xiaoai_apikey = "abcdefg"                |    小爱同学的apiKey, 详细请看下文        |
+| xiaoai_apikey  | string         |寄         |xiaoai_apikey = "abc1145141919810"       |    小爱同学的apiKey, 详细请看下文        |
 | Bot_NICKNAME   | string         |脑积水     |Bot_NICKNAME = "Hinata"                  |      你Bot的称呼                         |
 | Bot_MASTER     | string         |脑积水     |Bot_MASTER = "星野日向_Official"          |      你Bot主人的称呼                     |
 
@@ -28,7 +28,7 @@ env配置项:
        那么你应该在.env内填入:  xiaoai_apikey = "abc1145141919810"
 
 
-艾特bot时回复一些基于词库, 或青云客api或者小爱同学(好像这个api寄了)拿到的消息(优先词库, 这个词库有点色情)
+艾特bot时回复一些基于词库, 或青云客api或者小爱同学拿到的消息(优先词库, 这个词库有点色情)
 
 api切换的命令为:
 
