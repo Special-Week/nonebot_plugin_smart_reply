@@ -90,7 +90,8 @@ async def qinyun_reply(url):
         res = response.json()["content"].replace("林欣", Bot_MASTER).replace("{br}", "\n").replace("贾彦娟", Bot_MASTER).replace("周超辉", Bot_MASTER).replace(
             "鑫总", Bot_MASTER).replace("张鑫", Bot_MASTER).replace("菲菲", Bot_NICKNAME).replace("dn", Bot_MASTER).replace("1938877131", "2749903559").replace("小燕", Bot_NICKNAME)
         res = re.sub(u"\\{.*?\\}", "", res)
-        if "taobao" in res:
+        # 检查广告, 这个api广告太多了
+        if have_url(res):
             res = Bot_NICKNAME + "暂时听不懂主人说的话呢"
         return res
 
@@ -104,3 +105,19 @@ async def xiaoice_reply(url):
             return (res["text"]).replace("小爱", Bot_NICKNAME)
         else:
             return "寄"
+
+
+# 判断传入的字符串中是否有url存在(我他娘的就不信这样还能输出广告?)
+def have_url(s: str) -> bool:
+    index = s.find('.')     # 找到.的下标
+    if index == -1:         # 如果没有.则返回False
+        return False
+
+    flag1 = (u'\u0041' <= s[index-1] <= u'\u005a') or (u'\u0061' <=
+                                                       s[index-1] <= u'\u007a')        # 判断.前面的字符是否为字母
+    flag2 = (u'\u0041' <= s[index+1] <= u'\u005a') or (u'\u0061' <=
+                                                       s[index+1] <= u'\u007a')        # 判断.后面的字符是否为字母
+    if flag1 and flag2:     # 如果.前后都是字母则返回True
+        return True
+    else:               # 如果.前后不是字母则返回False
+        return False
