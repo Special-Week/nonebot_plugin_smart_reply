@@ -16,8 +16,8 @@ except:
 
 try:
     Bot_NICKNAME: str = nonebot.get_driver(
-    ).config.Bot_NICKNAME     # bot的nickname,可以换成你自己的
-    Bot_MASTER: str = nonebot.get_driver().config.Bot_MASTER      # bot的主人名称,也可以换成你自己的
+    ).config.bot_nickname     # bot的nickname,可以换成你自己的
+    Bot_MASTER: str = nonebot.get_driver().config.bot_master      # bot的主人名称,也可以换成你自己的
 except:
     Bot_NICKNAME: str = "脑积水"
     Bot_MASTER: str = "脑积水"
