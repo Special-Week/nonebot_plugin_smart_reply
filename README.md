@@ -22,6 +22,7 @@
 | Bot_MASTER     | string         |脑积水     |Bot_MASTER = "星野日向_Official"          |      你Bot主人的称呼                     |
 | openai_api_key    | string  |寄        |openai_api_key = "aabb114514"    |    openai的api_key, 详细请看下文         |
 | openai_max_tokens | int     |1000      |openai_max_tokens = 1500         |    openai的max_tokens, 详细请看下文     |
+
 .env完全不配置不影响插件运行, 但是部分功能会无法使用
 
 
