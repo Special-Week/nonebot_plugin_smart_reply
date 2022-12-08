@@ -47,7 +47,7 @@ api切换的命令为:
 
 
        
-关于openai:
+# 关于openai:
 
     openai_api_key请注册openai后在 https://beta.openai.com/account/api-keys 自己获取
 
