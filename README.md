@@ -1,7 +1,8 @@
 # nonebot2智能(障)回复插件
 
+艾特bot时回复一些基于词库, 或青云客api或者小爱同学拿到的消息(优先词库, 这个词库有点色情), 另外增加了openai的调用
 
-安装方式:
+### 安装方式:
 
     nb plugin install nonebot-plugin-smart-reply
     
@@ -9,7 +10,7 @@
     
     Download Zip
  
-env配置项:
+### env配置项:
 
 |config          |type            |default    |example                                  |usage                                   |
 |----------------|----------------|-----------|-----------------------------------------|----------------------------------------|
@@ -19,7 +20,7 @@ env配置项:
 | openai_api_key    | string  |寄        |openai_api_key = "aabb114514"    |    openai的api_key, 详细请看下文         |
 | openai_max_tokens | int     |1000      |openai_max_tokens = 1500         |    openai的max_tokens, 详细请看下文     |
 
-小爱同学apiKey的申请步骤:
+### 小爱同学apiKey的申请步骤:
 
     1. 进入网页 https://apibug.cn/doc/xiaoai.html
     2. 右上角注册登录
@@ -28,12 +29,6 @@ env配置项:
     5. 请求接口中 "&apiKey="后面的值就是你的apiKey, 填在.env内, 假设返回你的请求接口是 "https://apibug.cn/api/xiaoai/?msg=你是谁？&apiKey=abc1145141919810" 
        那么你应该在.env内填入:  xiaoai_apikey = "abc1145141919810"
        
-
-
-
-
-艾特bot时回复一些基于词库, 或青云客api或者小爱同学拿到的消息(优先词库, 这个词库有点色情)
-
 api切换的命令为:
 
     智障回复api切换 | ai切换 | api_switch | 智能回复api切换
@@ -47,7 +42,7 @@ api切换的命令为:
 
 
        
-# 关于openai:
+## 关于openai:
 
     openai_api_key请注册openai后在 https://beta.openai.com/account/api-keys 自己获取
 
@@ -63,7 +58,7 @@ api切换的命令为:
 
     这个模块貌似不是免费的, 注册的账号只有$18.00的免费额度, 我个人调用了大约1500回, 目前的额度 $7.05 / $18.00
 
-    一些具体的实例:
+    ### 一些具体的实例:
 
         Q: @bot求助 使用golang定义一个全局变量client, 并让其在init函数内与redis相连接
         A: @USER  
