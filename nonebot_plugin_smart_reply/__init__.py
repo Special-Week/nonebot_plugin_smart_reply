@@ -1,5 +1,6 @@
 from nonebot.plugin.on import on_message, on_notice, on_command
 from nonebot.rule import to_me
+from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
@@ -10,7 +11,7 @@ from nonebot.adapters.onebot.v11 import (
 )
 from .utils import *
 from loguru import logger
-
+import asyncio
 
 # 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
 api_flag = True
@@ -21,6 +22,10 @@ api_switch = on_command("智障回复api切换", aliases={
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
 poke_ = on_notice(rule=to_me(), block=False)
+# 使用openai的接口, 优先级5
+openai_text = on_command(
+    "求助", aliases={"请问", "帮忙"}, block=True, priority=5, rule=to_me())
+
 
 
 @api_switch.handle()
@@ -86,3 +91,18 @@ async def _poke_event(event: PokeNotifyEvent):
         # 随机回复poke__reply的内容
         else:
             await poke_.send(message=f"{random.choice(poke__reply)}")
+
+@openai_text.handle()
+async def _(msg: Message = CommandArg()):
+    if api_key == "寄":
+        await openai_text.finish("请先配置openai_api_key")
+    prompt = msg.extract_plain_text()
+    if prompt == "" or prompt == None or prompt.isspace():
+        await openai_text.finish("需要提供文本prompt")
+    await openai_text.send(MessageSegment.text("让本喵想想吧..."))
+    loop = asyncio.get_event_loop()
+    try:
+        res = await loop.run_in_executor(None, get_openai_reply, prompt)
+    except Exception as e:
+        await openai_text.finish(str(e))
+    await openai_text.finish(MessageSegment.text(res))
