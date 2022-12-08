@@ -84,7 +84,7 @@ api切换的命令为:
 
         Q: @bot求助 假如你是李华，今日中国三大运营商——中国联通，中国移动，中国电信，屏蔽了中国境内对 GitHub 的访问，请你使用英语向你的外国笔友
            Jane写一封信，简要讨论这件事。正文内容要点：（1）对GitHub被封感到震惊、（2）谈论此事对中国开源界的影响、（3）对中国开源界的未来进行探讨。
-           要求：（1）正文要点必须全部包含、（2）词数不少于120词、（3）文中不得出现真实的姓名
+           要求：（1）正文要点必须全部包含、（2）词数不少于100词、（3）文中不得出现真实的姓名
         A: @USER 
             Dear Jane,
             I am writing to tell you about a shocking news that three major Chinese operators, China Unicom, 
