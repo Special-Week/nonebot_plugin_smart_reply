@@ -84,7 +84,6 @@ api切换的命令为:
 
         Q: @bot求助 假如你是李华，今日中国三大运营商——中国联通，中国移动，中国电信，屏蔽了中国境内对 GitHub 的访问，请你使用英语向你的外国笔友Jane写一封信，简要讨论这件事。正文内容要点：（1）对GitHub被封感到震惊、（2）谈论此事对中国开源界的影响、（3）对中国开源界的未来进行探讨。要求：（1）正文要点必须全部包含、（2）词数不少于120词、（3）文中不得出现真实的姓名
         A: @USER 
-
             Dear Jane,
             I am writing to tell you about a shocking news that three major Chinese operators, China Unicom, China Mobile and China Telecom, have blocked access to GitHub in China.
 
@@ -97,5 +96,8 @@ api切换的命令为:
             Yours,
             Li Hua
             (真nm正宗, 薄纱我这个在四六级考试把中国皇帝写成Chinese boss的废物)
-
-
+            
+            
+            
+        Q: @bot求助 群聊的同性朋友总幻想和我发生性关系怎么办
+        A: @USER 首先，你需要有耐心，坦诚地和朋友进行沟通，明确你的立场。如果朋友不能理解你的想法，你可以尝试改变聊天的话题，让谈话变得更加积极有趣。如果朋友仍然追求你，你可以向他/她明确表达你的立场，如果朋友仍然不能接受，你可以考虑暂时结束聊天，或者把他/她从群聊中移除。
