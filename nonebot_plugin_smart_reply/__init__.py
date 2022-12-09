@@ -13,6 +13,14 @@ from .utils import *
 from loguru import logger
 import asyncio
 
+try:
+    cd_time = nonebot.get_driver().config.openai_cd_time
+except:
+    cd_time = 60        # 默认cd时间为60秒
+
+openai_cd_dir = {}  # 用于存放cd时间
+
+
 # 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
 api_flag = True
 # 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
@@ -93,16 +101,33 @@ async def _poke_event(event: PokeNotifyEvent):
             await poke_.send(message=f"{random.choice(poke__reply)}")
 
 @openai_text.handle()
-async def _(msg: Message = CommandArg()):
-    if api_key == "寄":
-        await openai_text.finish("请先配置openai_api_key")
-    prompt = msg.extract_plain_text()
+async def _(event: MessageEvent, msg: Message = CommandArg()):
+    if api_key == "寄":                             
+        await openai_text.finish("请先配置openai_api_key")          # 没有配置openai_api_key
+    prompt = msg.extract_plain_text()                               # 获取文本
     if prompt == "" or prompt == None or prompt.isspace():
-        await openai_text.finish("需要提供文本prompt")
-    await openai_text.send(MessageSegment.text("让本喵想想吧..."))
-    loop = asyncio.get_event_loop()
+        await openai_text.finish("需要提供文本prompt")                  # 没有提供文本
+
+    qid = event.get_user_id()                                       # 获取用户id
     try:
-        res = await loop.run_in_executor(None, get_openai_reply, prompt)
-    except Exception as e:
-        await openai_text.finish(str(e))
-    await openai_text.finish(MessageSegment.text(res))
+        cd = event.time - openai_cd_dir[qid]
+    except KeyError:
+        cd = cd_time + 1
+    if (            
+        cd > cd_time
+        or event.get_user_id() in nonebot.get_driver().config.superusers
+    ):                                                                          # 超过cd时间或者是超级用户
+        # 记录cd
+        openai_cd_dir.update({qid: event.time})
+        await openai_text.send(MessageSegment.text("让本喵想想吧..."))        # 发送消息
+        loop = asyncio.get_event_loop()                                # 获取事件循环
+        try:
+            res = await loop.run_in_executor(None, get_openai_reply, prompt)        # 开一个不会阻塞asyncio的线程调用get_openai_reply函数
+        except Exception as e:                                        # 如果出错
+            await openai_text.finish(str(e))                       # 发送错误信息
+        await openai_text.finish(MessageSegment.text(res),at_sender=True)   # 发送结果
+    else:
+        await openai_text.finish(
+            MessageSegment.text(f"让本喵的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
+            at_sender=True
+        )
