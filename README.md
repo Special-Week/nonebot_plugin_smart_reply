@@ -51,6 +51,8 @@ api切换的命令为:
        
 ## 关于openai:
 
+    0. 如果你出现了<module 'openai' has no attribute 'Completion'>的报错, 大概是和numpy相关, 解决方法是卸载numpy和openai然后再单独安装openai(numpy会被当作依赖再次下回来, 所以不需要再次下载numpy)
+
     1. openai_api_key请注册openai后在 https://beta.openai.com/account/api-keys 自己获取
 
     2. openai_max_tokens貌似是ai返回的文本最大多少(根据我自己用的经验)
