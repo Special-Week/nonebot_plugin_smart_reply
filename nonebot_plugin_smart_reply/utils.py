@@ -152,15 +152,14 @@ def get_openai_reply(prompt: str) -> str:
     return res
 
 
+
 def add_(word1: str, word2: str):
     """添加词条"""
     lis = []
     for key in AnimeThesaurus:
         if key == word1:
-            # 获取字典开头
-            add_list = key
             # 获取字典内容
-            lis = AnimeThesaurus[add_list]
+            lis = AnimeThesaurus[key]
             # 判断是否已存在问答
             for word in lis:
                 if word == word2:
@@ -170,8 +169,8 @@ def add_(word1: str, word2: str):
     if lis == []:
         axis = {word1: [word2]}
     else:
-        axis = {word1: lis.append(word2)}
-
+        lis.append(word2)
+        axis = {word1: lis}
     AnimeThesaurus.update(axis)
     with open(Path(__file__).parent.joinpath('resource/json/data.json'), "w", encoding="utf8") as f_new:
         json.dump(AnimeThesaurus, f_new, ensure_ascii=False, indent=4)
