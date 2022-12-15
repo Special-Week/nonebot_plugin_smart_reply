@@ -1,16 +1,17 @@
-from pathlib import Path
 import os
+import re
+import io
 import random
+import openai
 import nonebot
+from pathlib import Path
+from .txtToImg import txt_to_img
 try:
     import ujson as json
 except ModuleNotFoundError:
     import json
 from httpx import AsyncClient
-import re
-import openai
-import io
-from nonebot_plugin_imageutils import Text2Image
+
 
 try:
     apiKey: str = nonebot.get_driver().config.xiaoai_apikey
@@ -24,8 +25,6 @@ try:
 except:
     Bot_NICKNAME: str = "脑积水"
     Bot_MASTER: str = "脑积水"
-# NICKNAME: str = "Hinata"
-# MASTER: str = "星野日向_Official"
 
 try:
     api_key = nonebot.get_driver().config.openai_api_key
@@ -37,11 +36,8 @@ try:
 except:
     max_tokens = 1000
 
-
 # 载入词库(这个词库有点涩)
-AnimeThesaurus = json.load(open(Path(os.path.join(os.path.dirname(
-    __file__), "resource/json")) / "data.json", "r", encoding="utf8"))
-
+AnimeThesaurus = json.load(open(Path(__file__).parent.joinpath('resource/json/data.json'), "r", encoding="utf8"))
 
 # 获取resource/audio下面的全部文件
 aac_file_path = os.path.join(os.path.dirname(__file__), "resource/audio")
@@ -56,7 +52,6 @@ hello__reply = [
     "我在呢！",
     "呼呼，叫俺干嘛",
 ]
-
 
 # 戳一戳消息
 poke__reply = [
@@ -83,23 +78,19 @@ poke__reply = [
     "正在定位您的真实地址...定位成功。轰炸机已起飞",
 ]
 
-# 从字典里返还消息, 抄(借鉴)的zhenxun-bot
-
-
 async def get_chat_result(text: str, nickname: str) -> str:
+    """从字典里返还消息, 抄(借鉴)的zhenxun-bot"""
     if len(text) < 7:
         keys = AnimeThesaurus.keys()
         for key in keys:
             if text.find(key) != -1:
                 return random.choice(AnimeThesaurus[key]).replace("你", nickname)
 
-# 从qinyunke_api拿到消息
-
-
-async def qinyun_reply(url):
+async def qinyun_reply(url) -> str:
+    """从qinyunke_api拿到消息"""
     async with AsyncClient() as client:
         response = await client.get(url)
-        # 这个api好像问道主人或者他叫什么名字会返回私活,这里replace掉部分
+        # 这个api好像问道主人或者他叫什么名字会返回私活,这里replace掉部分(这里好丑，不想改了)
         res = response.json()["content"].replace("林欣", Bot_MASTER).replace("{br}", "\n").replace("贾彦娟", Bot_MASTER).replace("周超辉", Bot_MASTER).replace(
             "鑫总", Bot_MASTER).replace("张鑫", Bot_MASTER).replace("菲菲", Bot_NICKNAME).replace("dn", Bot_MASTER).replace("1938877131", "2749903559").replace("小燕", Bot_NICKNAME)
         res = re.sub(u"\\{.*?\\}", "", res)
@@ -108,10 +99,8 @@ async def qinyun_reply(url):
             res = Bot_NICKNAME + "暂时听不懂主人说的话呢"
         return res
 
-# 从小爱同学api拿到消息, 这个api私货比较少
-
-
 async def xiaoice_reply(url):
+    """从小爱同学api拿到消息, 这个api私货比较少"""
     async with AsyncClient() as client:
         res = (await client.get(url)).json()
         if res["code"] == 200:
@@ -119,9 +108,8 @@ async def xiaoice_reply(url):
         else:
             return "寄"
 
-
-# 判断传入的字符串中是否有url存在(我他娘的就不信这样还能输出广告?)
 def have_url(s: str) -> bool:
+    """判断传入的字符串中是否有url存在(我他娘的就不信这样还能输出广告?)"""
     index = s.find('.')     # 找到.的下标
     if index == -1:         # 如果没有.则返回False
         return False
@@ -136,14 +124,11 @@ def have_url(s: str) -> bool:
         return False
 
 def text_to_png(msg):
-    '''
-    文字转png
-    '''
-    output = io.BytesIO()
-    Text2Image.from_text(msg,50,spacing = 10).to_image("white",(20,20)).save(output, format="png")
-    return output
+    """文字转png"""
+    return txt_to_img(msg)
 
-def get_openai_reply(prompt:str)->str:
+def get_openai_reply(prompt: str) -> str:
+    """从openai api拿到消息"""
     openai.api_key = api_key
     response = openai.Completion.create(
         model="text-davinci-003",
@@ -160,56 +145,50 @@ def get_openai_reply(prompt:str)->str:
         res = res[1:]
     return res
 
-# 添加词条
-def add_(a,b):
-    with open(Path(os.path.join(os.path.dirname(
-    __file__), "resource/json")) / "data.json", "r", encoding="utf-8") as f:
-        content = json.load(f)
-        for c in AnimeThesaurus:
-            if c==a:
-                #获取字典开头
-                add_list =c
-                #获取字典内容
-                lis = AnimeThesaurus[add_list]
-                #判断是否已存在问答
-                for word in lis:
-                    if word == b:
-                        print('关键词已存在')
-                        return "1"
-        #判断是否存在关键词
-        try:
-            new_list = lis+[b]
-            axis = {a:new_list}
-        except:
-            axis = {a:[b]}
-        finally:
-            content.update(axis)
-            with open(Path(os.path.join(os.path.dirname(
-                __file__), "resource/json")) / "data.json", 'w', encoding="utf-8") as f_new:
-                json.dump(content, f_new,ensure_ascii=False,indent=4)
 
-# 查询关键词下词条
-def check_(a:str):
-    for c in AnimeThesaurus:
-        if a == c:
-            mes = "下面是关键词" + a + "的全部响应\n\n" 
+def add_(word1, word2):
+    """添加词条"""
+    lis = []
+    for key in AnimeThesaurus:
+        if key == word1:
+            # 获取字典开头
+            add_list = key
+            # 获取字典内容
+            lis = AnimeThesaurus[add_list]
+            # 判断是否已存在问答
+            for word in lis:
+                if word == word2:
+                    print('关键词已存在')
+                    return "寄"
+    # 判断是否存在关键词
+    if lis == []:
+        axis = {word1: [word2]}
+    else:
+        axis = {word1: lis.append(word2)}
+
+    AnimeThesaurus.update(axis)
+    with open(Path(__file__).parent.joinpath('resource/json/data.json'), "w", encoding="utf8") as f_new:
+        json.dump(AnimeThesaurus, f_new, ensure_ascii=False, indent=4)
+
+
+def check_(target: str)->str:
+    """查询关键词下词条"""
+    for item in AnimeThesaurus:
+        if target == item:
+            mes = "下面是关键词" + target + "的全部响应\n\n"
             # 获取关键词
-            lis = AnimeThesaurus[c]
+            lis = AnimeThesaurus[item]
             n = 0
             for word in lis:
                 n = n + 1
                 mes = mes + str(n) + '、'+word + '\n'
-    print(mes)         
-    return mes
+            return mes
+    return "寄"
 
-#查询全部关键词
+
 def check_al():
+    """查询全部关键词"""
     mes = "下面是全部关键词\n\n"
     for c in AnimeThesaurus:
         mes = mes + c + '\n'
     return mes
-            
-            
-
-
-

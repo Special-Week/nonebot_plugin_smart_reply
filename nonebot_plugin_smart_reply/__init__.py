@@ -1,8 +1,12 @@
-from nonebot.plugin.on import on_message, on_notice, on_command,on_regex
-from nonebot.rule import to_me
-from nonebot.params import CommandArg,RegexGroup,Arg, ArgPlainText
-from nonebot.permission import SUPERUSER
+import asyncio
+from .utils import *
 from typing import Tuple
+from loguru import logger
+from nonebot.rule import to_me
+from nonebot.matcher import Matcher
+from nonebot.permission import SUPERUSER
+from nonebot.params import CommandArg, RegexGroup, ArgPlainText
+from nonebot.plugin.on import on_message, on_notice, on_command, on_regex
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     Message,
@@ -10,11 +14,8 @@ from nonebot.adapters.onebot.v11 import (
     PokeNotifyEvent,
     MessageSegment
 )
-from nonebot.matcher import Matcher
-from .utils import *
-from loguru import logger
-import asyncio
-from nonebot_plugin_htmlrender import md_to_pic
+
+
 try:
     cd_time = nonebot.get_driver().config.openai_cd_time
 except:
@@ -22,7 +23,7 @@ except:
 
 openai_cd_dir = {}  # 用于存放cd时间
 
-#添加和删除关键词
+# 添加和删除关键词
 add_new = on_regex(
     r"^添加关键词\s*(\S+.*?)\s*答\s*(\S+.*?)\s*$",
     flags=re.S,
@@ -47,9 +48,8 @@ check_all = on_command(
     rule=to_me(),
     permission=SUPERUSER,
 )
-dal_new = on_regex(
-    r"^删除关键词\s*(\S+.*?)\s*删\s*(\S+.*?)\s*$",
-    flags=re.S,
+del_new = on_command(
+    "删除关键词",
     block=True,
     priority=11,
     rule=to_me(),
@@ -60,12 +60,12 @@ dal_new = on_regex(
 api_flag = True
 # 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
 api_switch = on_command(
-    "智障回复api切换", 
+    "智障回复api切换",
     aliases={"ai切换", "api_switch", "智能回复api切换"},
-    permission=SUPERUSER, 
-    rule=to_me(), 
+    permission=SUPERUSER,
+    rule=to_me(),
     block=True
-    )
+)
 # 优先级99, 条件: 艾特bot就触发
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
@@ -75,18 +75,17 @@ openai_text = on_command(
     "求助", aliases={"请问", "帮忙"}, block=True, priority=5, rule=to_me())
 
 
-
-    
 @add_new.handle()
 async def _(
     matched: Tuple[str, ...] = RegexGroup(),
 ):
-    word1,word2 = matched
-    if add_(word1,word2) == "1":
-        await add_new.finish("这个关键词已经记住辣")     
+    word1, word2 = matched
+    if add_(word1, word2) == "寄":
+        await add_new.finish("这个关键词已经记住辣")
     else:
         await add_new.finish("我记住了\n关键词："+word1+"\n回复："+word2)
-    
+
+
 @check_new.handle()
 async def _(
     matcher: Matcher,
@@ -96,38 +95,57 @@ async def _(
     if word1:
         matcher.set_arg("word", args)
 
-    
-@check_new.got("word", prompt = "你要查看哪个关键词（查看所有关键词指令：查看所有关键词）")
-async def _( tag: str = ArgPlainText("word")):
-    try:
-        mes = check_(tag)
-        #以图片输出
-        output = text_to_png(mes)
+
+@check_new.got("word", prompt="你要查看哪个关键词（查看所有关键词指令：查看所有关键词）")
+async def _(tag: str = ArgPlainText("word")):
+    mes = check_(tag)
+    if mes == "寄":
+        await add_new.finish("抱歉没有记过这个关键词捏，请输入[查询所有关键词]来获取全部关键词")
+    else:
+        output = text_to_png(mes) # 将文字转换为图片
         await add_new.finish(MessageSegment.image(output))
-    except:
-        await add_new.finish("抱歉没有记过这个关键词捏，请输入[查询所有关键词]来获取全部关键词")  
-   
+
+
 @check_all.handle()
 async def _():
     mes = check_al()
     output = text_to_png(mes)
     await add_new.finish(MessageSegment.image(output))
-    
+
+@del_new.handle()
+async def _(args: Message = CommandArg()):
+    key = args.extract_plain_text()
+    if key=="" or key.isspace():
+        await del_new.finish("没有关键词，del失败")
+    else:
+        try:
+            del AnimeThesaurus[key]
+            with open(Path(__file__).parent.joinpath('resource/json/data.json'), "w", encoding="utf8") as f_new:
+                json.dump(AnimeThesaurus, f_new, ensure_ascii=False, indent=4)
+        except:
+            await del_new.finish("del失败, 貌似没有这个关键词呢")
+
+
+
+
+
+@check_new.handle()
+async def a_(
+    matched: Tuple[str, ...] = RegexGroup(),
+):
+    word1 = matched
+    if check_(word1) == "1":
+        await add_new.finish("抱歉没有记过这个关键词捏，请输入[查询关键词]来获取全部关键词")
+    else:
+        await add_new.finish("我记住了\n关键词："+word1+"\n回复：")
+
 
 @api_switch.handle()
 async def _():
     global api_flag
     api_flag = not api_flag
     await api_switch.send(message=f"切换成功, 当前智能回复api为{'青云客' if api_flag else '小爱同学'}")
-@check_new.handle()
-async def a_(
-    matched: Tuple[str, ...] = RegexGroup(),
-):
-    word1 =matched
-    if check_(word1) == "1":
-        await add_new.finish("抱歉没有记过这个关键词捏，请输入[查询关键词]来获取全部关键词")     
-    else:
-        await add_new.finish("我记住了\n关键词："+word1+"\n回复：")
+
 
 @ai.handle()
 async def _(event: MessageEvent):
@@ -186,10 +204,12 @@ async def _poke_event(event: PokeNotifyEvent):
         else:
             await poke_.send(message=f"{random.choice(poke__reply)}")
 
+
 @openai_text.handle()
 async def _(event: MessageEvent, msg: Message = CommandArg()):
-    if api_key == "寄":                             
-        await openai_text.finish("请先配置openai_api_key")          # 没有配置openai_api_key
+    if api_key == "寄":
+        # 没有配置openai_api_key
+        await openai_text.finish("请先配置openai_api_key")
     prompt = msg.extract_plain_text()                               # 获取文本
     if prompt == "" or prompt == None or prompt.isspace():
         await openai_text.finish("需要提供文本prompt")                  # 没有提供文本
@@ -199,7 +219,7 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
         cd = event.time - openai_cd_dir[qid]
     except KeyError:
         cd = cd_time + 1
-    if (            
+    if (
         cd > cd_time
         or event.get_user_id() in nonebot.get_driver().config.superusers
     ):                                                                          # 超过cd时间或者是超级用户
@@ -208,12 +228,15 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
         await openai_text.send(MessageSegment.text("让本喵想想吧..."))        # 发送消息
         loop = asyncio.get_event_loop()                                # 获取事件循环
         try:
-            res = await loop.run_in_executor(None, get_openai_reply, prompt)        # 开一个不会阻塞asyncio的线程调用get_openai_reply函数
+            # 开一个不会阻塞asyncio的线程调用get_openai_reply函数
+            res = await loop.run_in_executor(None, get_openai_reply, prompt)
         except Exception as e:                                        # 如果出错
             await openai_text.finish(str(e))                       # 发送错误信息
-        await openai_text.finish(MessageSegment.text(res),at_sender=True)   # 发送结果
+        # 发送结果
+        await openai_text.finish(MessageSegment.text(res), at_sender=True)
     else:
         await openai_text.finish(
-            MessageSegment.text(f"让本喵的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
+            MessageSegment.text(
+                f"让本喵的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
             at_sender=True
         )
