@@ -11,6 +11,8 @@
 	查看所有关键词
 	删除关键词 xxx
 	注: 其中添加关键词相应器用的是on_regex, 其余全是on_command, 请注意是否需要带上.env响应头command_start
+	    查看关键词,查看所有关键词采取的是输出图片的形式发送的, 如果这两个功能用的时候报错, 那么我猜测你的Linux没有simsun.ttc(宋体)这个字体
+	    解决方案: 源码内txtToImg.py中函数txt_to_img第三个参数font_path的值, 换成你系统有的字体, 或者安装simsun.ttc这个字体
 
 ### 安装方式:
 
