@@ -1,7 +1,8 @@
-from nonebot.plugin.on import on_message, on_notice, on_command
+from nonebot.plugin.on import on_message, on_notice, on_command,on_regex
 from nonebot.rule import to_me
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg,RegexGroup,Arg, ArgPlainText
 from nonebot.permission import SUPERUSER
+from typing import Tuple
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     Message,
@@ -9,10 +10,11 @@ from nonebot.adapters.onebot.v11 import (
     PokeNotifyEvent,
     MessageSegment
 )
+from nonebot.matcher import Matcher
 from .utils import *
 from loguru import logger
 import asyncio
-
+from nonebot_plugin_htmlrender import md_to_pic
 try:
     cd_time = nonebot.get_driver().config.openai_cd_time
 except:
@@ -20,12 +22,50 @@ except:
 
 openai_cd_dir = {}  # 用于存放cd时间
 
+#添加和删除关键词
+add_new = on_regex(
+    r"^添加关键词\s*(\S+.*?)\s*答\s*(\S+.*?)\s*$",
+    flags=re.S,
+    block=True,
+    priority=11,
+    rule=to_me(),
+    permission=SUPERUSER,
+)
+check_new = on_command(
+    "查看关键词",
+    aliases={"查询关键词"},
+    block=True,
+    priority=11,
+    rule=to_me(),
+    permission=SUPERUSER,
+)
+check_all = on_command(
+    "查看所有关键词",
+    aliases={"查询所有关键词"},
+    block=True,
+    priority=11,
+    rule=to_me(),
+    permission=SUPERUSER,
+)
+dal_new = on_regex(
+    r"^删除关键词\s*(\S+.*?)\s*删\s*(\S+.*?)\s*$",
+    flags=re.S,
+    block=True,
+    priority=11,
+    rule=to_me(),
+    permission=SUPERUSER,
+)
 
 # 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
 api_flag = True
 # 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
-api_switch = on_command("智障回复api切换", aliases={
-                        "ai切换", "api_switch", "智能回复api切换"}, permission=SUPERUSER, rule=to_me(), block=True)
+api_switch = on_command(
+    "智障回复api切换", 
+    aliases={"ai切换", "api_switch", "智能回复api切换"},
+    permission=SUPERUSER, 
+    rule=to_me(), 
+    block=True
+    )
 # 优先级99, 条件: 艾特bot就触发
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
@@ -36,12 +76,58 @@ openai_text = on_command(
 
 
 
+    
+@add_new.handle()
+async def _(
+    matched: Tuple[str, ...] = RegexGroup(),
+):
+    word1,word2 = matched
+    if add_(word1,word2) == "1":
+        await add_new.finish("这个关键词已经记住辣")     
+    else:
+        await add_new.finish("我记住了\n关键词："+word1+"\n回复："+word2)
+    
+@check_new.handle()
+async def _(
+    matcher: Matcher,
+    args: Message = CommandArg()
+):
+    word1 = args.extract_plain_text()
+    if word1:
+        matcher.set_arg("word", args)
+
+    
+@check_new.got("word", prompt = "你要查看哪个关键词（查看所有关键词指令：查看所有关键词）")
+async def _( tag: str = ArgPlainText("word")):
+    try:
+        mes = check_(tag)
+        #以图片输出
+        output = text_to_png(mes)
+        await add_new.finish(MessageSegment.image(output))
+    except:
+        await add_new.finish("抱歉没有记过这个关键词捏，请输入[查询所有关键词]来获取全部关键词")  
+   
+@check_all.handle()
+async def _():
+    mes = check_al()
+    output = text_to_png(mes)
+    await add_new.finish(MessageSegment.image(output))
+    
+
 @api_switch.handle()
 async def _():
     global api_flag
     api_flag = not api_flag
     await api_switch.send(message=f"切换成功, 当前智能回复api为{'青云客' if api_flag else '小爱同学'}")
-
+@check_new.handle()
+async def a_(
+    matched: Tuple[str, ...] = RegexGroup(),
+):
+    word1 =matched
+    if check_(word1) == "1":
+        await add_new.finish("抱歉没有记过这个关键词捏，请输入[查询关键词]来获取全部关键词")     
+    else:
+        await add_new.finish("我记住了\n关键词："+word1+"\n回复：")
 
 @ai.handle()
 async def _(event: MessageEvent):
