@@ -9,7 +9,8 @@ except ModuleNotFoundError:
 from httpx import AsyncClient
 import re
 import openai
-
+import io
+from nonebot_plugin_imageutils import Text2Image
 
 try:
     apiKey: str = nonebot.get_driver().config.xiaoai_apikey
@@ -134,6 +135,13 @@ def have_url(s: str) -> bool:
     else:               # 如果.前后不是字母则返回False
         return False
 
+def text_to_png(msg):
+    '''
+    文字转png
+    '''
+    output = io.BytesIO()
+    Text2Image.from_text(msg,50,spacing = 10).to_image("white",(20,20)).save(output, format="png")
+    return output
 
 def get_openai_reply(prompt:str)->str:
     openai.api_key = api_key
@@ -152,23 +160,21 @@ def get_openai_reply(prompt:str)->str:
         res = res[1:]
     return res
 
-#添加词条
+# 添加词条
 def add_(a,b):
-    data = json.load(open(Path(os.path.join(os.path.dirname(
-    __file__), "resource/json")) / "data.json", "r", encoding="utf8"))
     with open(Path(os.path.join(os.path.dirname(
     __file__), "resource/json")) / "data.json", "r", encoding="utf-8") as f:
         content = json.load(f)
-        for c in data:
+        for c in AnimeThesaurus:
             if c==a:
                 #获取字典开头
                 add_list =c
                 #获取字典内容
-                lis = data[add_list]
+                lis = AnimeThesaurus[add_list]
                 #判断是否已存在问答
                 for word in lis:
                     if word == b:
-                        print('词条已存在')
+                        print('关键词已存在')
                         return "1"
         #判断是否存在关键词
         try:
@@ -177,8 +183,33 @@ def add_(a,b):
         except:
             axis = {a:[b]}
         finally:
-            print('已添加问答'+b)
             content.update(axis)
             with open(Path(os.path.join(os.path.dirname(
                 __file__), "resource/json")) / "data.json", 'w', encoding="utf-8") as f_new:
                 json.dump(content, f_new,ensure_ascii=False,indent=4)
+
+# 查询关键词下词条
+def check_(a:str):
+    for c in AnimeThesaurus:
+        if a == c:
+            mes = "下面是关键词" + a + "的全部响应\n\n" 
+            # 获取关键词
+            lis = AnimeThesaurus[c]
+            n = 0
+            for word in lis:
+                n = n + 1
+                mes = mes + str(n) + '、'+word + '\n'
+    print(mes)         
+    return mes
+
+#查询全部关键词
+def check_al():
+    mes = "下面是全部关键词\n\n"
+    for c in AnimeThesaurus:
+        mes = mes + c + '\n'
+    return mes
+            
+            
+
+
+
