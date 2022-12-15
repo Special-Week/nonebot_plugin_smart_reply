@@ -151,3 +151,34 @@ def get_openai_reply(prompt:str)->str:
     while res.startswith("\n"):
         res = res[1:]
     return res
+
+#添加词条
+def add_(a,b):
+    data = json.load(open(Path(os.path.join(os.path.dirname(
+    __file__), "resource/json")) / "data.json", "r", encoding="utf8"))
+    with open(Path(os.path.join(os.path.dirname(
+    __file__), "resource/json")) / "data.json", "r", encoding="utf-8") as f:
+        content = json.load(f)
+        for c in data:
+            if c==a:
+                #获取字典开头
+                add_list =c
+                #获取字典内容
+                lis = data[add_list]
+                #判断是否已存在问答
+                for word in lis:
+                    if word == b:
+                        print('词条已存在')
+                        return "1"
+        #判断是否存在关键词
+        try:
+            new_list = lis+[b]
+            axis = {a:new_list}
+        except:
+            axis = {a:[b]}
+        finally:
+            print('已添加问答'+b)
+            content.update(axis)
+            with open(Path(os.path.join(os.path.dirname(
+                __file__), "resource/json")) / "data.json", 'w', encoding="utf-8") as f_new:
+                json.dump(content, f_new,ensure_ascii=False,indent=4)

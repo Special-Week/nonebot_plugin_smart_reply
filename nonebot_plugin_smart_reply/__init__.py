@@ -1,7 +1,8 @@
-from nonebot.plugin.on import on_message, on_notice, on_command
+from nonebot.plugin.on import on_message, on_notice, on_command,on_regex
 from nonebot.rule import to_me
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg,RegexGroup
 from nonebot.permission import SUPERUSER
+from typing import Tuple
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     Message,
@@ -20,7 +21,15 @@ except:
 
 openai_cd_dir = {}  # 用于存放cd时间
 
-
+#这里是添加关键词,只有超管权限
+add_new = on_regex(
+    r"^添加关键词\s*(\S+.*?)\s*答\s*(\S+.*?)\s*$",
+    flags=re.S,
+    block=True,
+    priority=11,
+    rule=to_me(),
+    permission=SUPERUSER,
+)
 # 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
 api_flag = True
 # 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
@@ -34,7 +43,15 @@ poke_ = on_notice(rule=to_me(), block=False)
 openai_text = on_command(
     "求助", aliases={"请问", "帮忙"}, block=True, priority=5, rule=to_me())
 
-
+@add_new.handle()
+async def a_(
+    matched: Tuple[str, ...] = RegexGroup(),
+):
+    word1,word2 =matched
+    if add_(word1,word2) == "1":
+        await add_new.finish("这个关键词已经记住辣")     
+    else:
+        await add_new.finish("我记住了\n关键词："+word1+"\n回复："+word2)
 
 @api_switch.handle()
 async def _():
