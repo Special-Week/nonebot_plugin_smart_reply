@@ -1,6 +1,5 @@
 import os
 import re
-import io
 import random
 import openai
 import nonebot
@@ -37,7 +36,8 @@ except:
     max_tokens = 1000
 
 # 载入词库(这个词库有点涩)
-AnimeThesaurus = json.load(open(Path(__file__).parent.joinpath('resource/json/data.json'), "r", encoding="utf8"))
+AnimeThesaurus = json.load(open(Path(__file__).parent.joinpath(
+    'resource/json/data.json'), "r", encoding="utf8"))
 
 # 获取resource/audio下面的全部文件
 aac_file_path = os.path.join(os.path.dirname(__file__), "resource/audio")
@@ -78,6 +78,7 @@ poke__reply = [
     "正在定位您的真实地址...定位成功。轰炸机已起飞",
 ]
 
+
 async def get_chat_result(text: str, nickname: str) -> str:
     """从字典里返还消息, 抄(借鉴)的zhenxun-bot"""
     if len(text) < 7:
@@ -86,7 +87,8 @@ async def get_chat_result(text: str, nickname: str) -> str:
             if text.find(key) != -1:
                 return random.choice(AnimeThesaurus[key]).replace("你", nickname)
 
-async def qinyun_reply(url) -> str:
+
+async def qinyun_reply(url: str) -> str:
     """从qinyunke_api拿到消息"""
     async with AsyncClient() as client:
         response = await client.get(url)
@@ -99,7 +101,8 @@ async def qinyun_reply(url) -> str:
             res = Bot_NICKNAME + "暂时听不懂主人说的话呢"
         return res
 
-async def xiaoice_reply(url):
+
+async def xiaoice_reply(url: str) -> str:
     """从小爱同学api拿到消息, 这个api私货比较少"""
     async with AsyncClient() as client:
         res = (await client.get(url)).json()
@@ -107,6 +110,7 @@ async def xiaoice_reply(url):
             return (res["text"]).replace("小爱", Bot_NICKNAME)
         else:
             return "寄"
+
 
 def have_url(s: str) -> bool:
     """判断传入的字符串中是否有url存在(我他娘的就不信这样还能输出广告?)"""
@@ -123,9 +127,11 @@ def have_url(s: str) -> bool:
     else:               # 如果.前后不是字母则返回False
         return False
 
-def text_to_png(msg):
+
+def text_to_png(msg: str) -> bytes:
     """文字转png"""
     return txt_to_img(msg)
+
 
 def get_openai_reply(prompt: str) -> str:
     """从openai api拿到消息"""
@@ -146,7 +152,7 @@ def get_openai_reply(prompt: str) -> str:
     return res
 
 
-def add_(word1, word2):
+def add_(word1: str, word2: str):
     """添加词条"""
     lis = []
     for key in AnimeThesaurus:
@@ -171,7 +177,7 @@ def add_(word1, word2):
         json.dump(AnimeThesaurus, f_new, ensure_ascii=False, indent=4)
 
 
-def check_(target: str)->str:
+def check_(target: str) -> str:
     """查询关键词下词条"""
     for item in AnimeThesaurus:
         if target == item:
@@ -186,7 +192,7 @@ def check_(target: str)->str:
     return "寄"
 
 
-def check_al():
+def check_al() -> str:
     """查询全部关键词"""
     mes = "下面是全部关键词\n\n"
     for c in AnimeThesaurus:
