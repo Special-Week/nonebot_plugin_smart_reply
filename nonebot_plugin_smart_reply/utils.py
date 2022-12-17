@@ -163,7 +163,6 @@ def add_(word1: str, word2: str):
             # 判断是否已存在问答
             for word in lis:
                 if word == word2:
-                    print('问答已存在')
                     return "寄"
     # 判断是否存在关键词
     if lis == []:
@@ -203,16 +202,11 @@ def del_(word1: str, word2: int):
     lis = []
     for key in AnimeThesaurus:
         if key == word1:
-            # 获取字典内容
-            print("获取字典内容")
             lis = AnimeThesaurus[key]
             word2 = int(word2) - 1
-            print(word2)
             try:
                 lis.pop(word2)
-                print("删除该元素成功")
                 axis = {word1: lis}
-                print("获取新列表成功")
             except:
                 return "寄"
     AnimeThesaurus.update(axis)

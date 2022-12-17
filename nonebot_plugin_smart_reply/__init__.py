@@ -129,7 +129,7 @@ async def _(args: Message = CommandArg()):
             del AnimeThesaurus[key]
             with open(Path(__file__).parent.joinpath('resource/json/data.json'), "w", encoding="utf8") as f_new:
                 json.dump(AnimeThesaurus, f_new, ensure_ascii=False, indent=4)
-            await del_new.finish("已删除该关键词下所有回复~")
+            await del_new.send("已删除该关键词下所有回复~")
         except:
             await del_new.finish("del失败, 貌似没有这个关键词呢")
 
