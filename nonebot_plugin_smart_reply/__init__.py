@@ -55,7 +55,14 @@ del_new = on_command(
     rule=to_me(),
     permission=SUPERUSER,
 )
-
+del_new_list = on_regex(
+    r"^删除关键词\s*(\S+.*?)\s*删\s*(\S+.*?)\s*$",
+    flags=re.S,
+    block=True,
+    priority=10,
+    rule=to_me(),
+    permission=SUPERUSER,
+)
 # 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
 api_flag = True
 # 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
@@ -122,22 +129,19 @@ async def _(args: Message = CommandArg()):
             del AnimeThesaurus[key]
             with open(Path(__file__).parent.joinpath('resource/json/data.json'), "w", encoding="utf8") as f_new:
                 json.dump(AnimeThesaurus, f_new, ensure_ascii=False, indent=4)
+            await del_new.finish("已删除该关键词下所有回复~")
         except:
             await del_new.finish("del失败, 貌似没有这个关键词呢")
 
-
-
-
-
-@check_new.handle()
-async def a_(
-    matched: Tuple[str, ...] = RegexGroup(),
+@del_new_list.handle()
+async def _(
+    matched: Tuple[str, int] = RegexGroup(),
 ):
-    word1 = matched
-    if check_(word1) == "1":
-        await add_new.finish("抱歉没有记过这个关键词捏，请输入[查询关键词]来获取全部关键词")
+    word1, word2 = matched
+    if del_(word1, word2) == "寄":
+        await del_new_list.finish("找不到关键词或回复序号，请用查看命令核对")
     else:
-        await add_new.finish("我记住了\n关键词："+word1+"\n回复：")
+        await del_new_list.finish("删除成功~")
 
 
 @api_switch.handle()
