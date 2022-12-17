@@ -199,7 +199,7 @@ def check_al() -> str:
 
 def del_(word1: str, word2: int):
     """删除关键词下具体回答"""
-    lis = []
+    axis = {}
     for key in AnimeThesaurus:
         if key == word1:
             lis = AnimeThesaurus[key]
@@ -209,6 +209,8 @@ def del_(word1: str, word2: int):
                 axis = {word1: lis}
             except:
                 return "寄"
+    if axis == {}:
+        return "寄"
     AnimeThesaurus.update(axis)
     with open(Path(__file__).parent.joinpath('resource/json/data.json'), "w", encoding="utf8") as f_new:
         json.dump(AnimeThesaurus, f_new, ensure_ascii=False, indent=4)
