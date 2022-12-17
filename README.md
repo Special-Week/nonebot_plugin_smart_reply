@@ -6,11 +6,13 @@
     艾特bot时并且加上"求助", "请问"的命令头时, bot回复一些调用openai的ai回复(这个ai真他娘的逆天), 具体效果请见下文
 
 ## 词库添加关键词:
-	添加关键词 a 答 b			 
-	查看关键词 xxx
-	查看所有关键词
-	删除关键词 xxx
-	注: 其中添加关键词相应器用的是on_regex, 其余全是on_command, 请注意是否需要带上.env响应头command_start
+	1、添加关键词 [text1] 答 [text2]		 
+	2、查看关键词 [text1]
+	3、查看所有关键词
+	4、删除关键词 [text1]
+    5、删除关键词 [text1] 删 [number]
+	注: 其中1，5相应器用的是on_regex, 其余全是on_command, 请注意是否需要带上.env响应头command_start
+        删除关键词的[number]可以用指令第二个查询查询
 	    查看关键词,查看所有关键词采取的是输出图片的形式发送的, 如果这两个功能用的时候报错, 那么我猜测你的Linux没有simsun.ttc(宋体)这个字体
 	    解决方案: 源码内txtToImg.py中函数txt_to_img第三个参数font_path的值, 换成你系统有的字体, 或者安装simsun.ttc这个字体
 
