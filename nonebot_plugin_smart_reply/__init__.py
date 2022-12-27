@@ -198,15 +198,10 @@ async def _(event: MessageEvent):
 async def _poke_event(event: PokeNotifyEvent):
     if event.is_tome:
         # 50%概率回复莲宝的藏话
-        if random.random() < 0.5:
+
             # 发送语音需要配置ffmpeg, 这里try一下, 不行就随机回复poke__reply的内容
-            try:
-                await poke_.send(MessageSegment.record(Path(aac_file_path)/random.choice(aac_file_list)))
-            except:
-                await poke_.send(message=f"{random.choice(poke__reply)}")
-        # 随机回复poke__reply的内容
-        else:
-            await poke_.send(message=f"{random.choice(poke__reply)}")
+        await poke_.send(MessageSegment.record(Path(aac_file_path)/random.choice(aac_file_list)))
+
 
 
 @openai_text.handle()
