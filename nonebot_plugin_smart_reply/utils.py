@@ -16,6 +16,7 @@ config = nonebot.get_driver().config
 xiaoai_api_key: str = getattr(config, "xiaoai_apikey", "寄")
 Bot_NICKNAME: str = getattr(config, "bot_nickname", "脑积水")
 Bot_MASTER: str = getattr(config, "Bot_MASTER", "脑积水")
+reply_private: bool = getattr(config, "ai_reply_private", False)
 openai_api_key: str = getattr(config, "openai_api_key", "寄")
 max_tokens: int = getattr(config, "openai_max_tokens", 1000)
 cd_time: int = getattr(config, "openai_cd_time", 60)

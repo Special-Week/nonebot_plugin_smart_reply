@@ -30,6 +30,7 @@
 | xiaoai_apikey  | string         |寄         |xiaoai_apikey = "abc1145141919810"       |    小爱同学的apiKey, 详细请看下文        |
 | Bot_NICKNAME   | string         |脑积水     |Bot_NICKNAME = "Hinata"                  |      你Bot的称呼                         |
 | Bot_MASTER     | string         |脑积水     |Bot_MASTER = "星野日向_Official"          |      你Bot主人的称呼                     |
+| ai_reply_private  | boolean |false     |ai_reply_private = true          |    私聊时是否启用AI聊天（不影响功能性指令）            |
 | openai_api_key    | string  |寄        |openai_api_key = "aabb114514"    |    openai的api_key, 详细请看下文         |
 | openai_max_tokens | int     |1000      |openai_max_tokens = 1500         |    openai的max_tokens, 详细请看下文     |
 | openai_cd_time    | int     |60        |openai_cd_time = 114             |    openai调用的cd                       |

@@ -9,6 +9,7 @@ from nonebot.params import CommandArg, RegexGroup, ArgPlainText
 from nonebot.plugin.on import on_message, on_notice, on_command, on_regex
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
+    PrivateMessageEvent,
     Message,
     MessageEvent,
     PokeNotifyEvent,
@@ -146,6 +147,10 @@ async def _():
 
 @ai.handle()
 async def _(event: MessageEvent):
+    # 配置私聊不启用后，私聊信息直接结束处理
+    if not reply_private and isinstance(event, PrivateMessageEvent):
+        await ai.finish()
+        return
     # 获取消息文本
     msg = str(event.get_message())
     # 去掉带中括号的内容(去除cq码)
