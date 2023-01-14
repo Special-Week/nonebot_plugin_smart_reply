@@ -17,6 +17,8 @@ from nonebot.adapters.onebot.v11 import (
 )
 
 
+openai_cd_dir = {}  # 用于存放cd时间
+
 # 添加和删除关键词
 add_new = on_regex(
     r"^添加关键词\s*(\S+.*?)\s*答\s*(\S+.*?)\s*$",
