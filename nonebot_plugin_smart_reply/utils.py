@@ -12,28 +12,14 @@ except ModuleNotFoundError:
 from httpx import AsyncClient
 
 
-try:
-    apiKey: str = nonebot.get_driver().config.xiaoai_apikey
-except:
-    apiKey: str = "寄"
-
-try:
-    Bot_NICKNAME: str = nonebot.get_driver(
-    ).config.bot_nickname     # bot的nickname,可以换成你自己的
-    Bot_MASTER: str = nonebot.get_driver().config.bot_master      # bot的主人名称,也可以换成你自己的
-except:
-    Bot_NICKNAME: str = "脑积水"
-    Bot_MASTER: str = "脑积水"
-
-try:
-    api_key = nonebot.get_driver().config.openai_api_key
-except:
-    api_key = '寄'
-
-try:
-    max_tokens = nonebot.get_driver().config.openai_max_tokens
-except:
-    max_tokens = 1000
+config = nonebot.get_driver().config
+xiaoai_api_key: str = getattr(config, "xiaoai_apikey", "寄")
+Bot_NICKNAME: str = getattr(config, "bot_nickname", "脑积水")
+Bot_MASTER: str = getattr(config, "Bot_MASTER", "脑积水")
+reply_private: bool = getattr(config, "ai_reply_private", False)
+openai_api_key: str = getattr(config, "openai_api_key", "寄")
+max_tokens: int = getattr(config, "openai_max_tokens", 1000)
+cd_time: int = getattr(config, "openai_cd_time", 60)
 
 # 载入词库(这个词库有点涩)
 AnimeThesaurus = json.load(open(Path(__file__).parent.joinpath(
@@ -135,7 +121,7 @@ def text_to_png(msg: str) -> bytes:
 
 def get_openai_reply(prompt: str) -> str:
     """从openai api拿到消息"""
-    openai.api_key = api_key
+    openai.api_key = openai_api_key
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,

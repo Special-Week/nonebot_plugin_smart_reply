@@ -9,17 +9,13 @@ from nonebot.params import CommandArg, RegexGroup, ArgPlainText
 from nonebot.plugin.on import on_message, on_notice, on_command, on_regex
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
+    PrivateMessageEvent,
     Message,
     MessageEvent,
     PokeNotifyEvent,
     MessageSegment
 )
 
-
-try:
-    cd_time = nonebot.get_driver().config.openai_cd_time
-except:
-    cd_time = 60        # 默认cd时间为60秒
 
 openai_cd_dir = {}  # 用于存放cd时间
 
@@ -153,6 +149,10 @@ async def _():
 
 @ai.handle()
 async def _(event: MessageEvent):
+    # 配置私聊不启用后，私聊信息直接结束处理
+    if not reply_private and isinstance(event, PrivateMessageEvent):
+        await ai.finish()
+        return
     # 获取消息文本
     msg = str(event.get_message())
     # 去掉带中括号的内容(去除cq码)
@@ -183,8 +183,8 @@ async def _(event: MessageEvent):
             message = await qinyun_reply(qinyun_url)
             logger.info("来自青云客的智能回复: " + message)
         else:
-            xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={apiKey}"
-            if apiKey == "寄":
+            xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={xiaoai_api_key}"
+            if xiaoai_api_key == "寄":
                 await ai.finish("小爱同学apiKey未设置, 请联系SUPERUSERS在.env中设置")
             message = await xiaoice_reply(xiaoai_url)
             if message == "寄":
@@ -211,7 +211,7 @@ async def _poke_event(event: PokeNotifyEvent):
 
 @openai_text.handle()
 async def _(event: MessageEvent, msg: Message = CommandArg()):
-    if api_key == "寄":
+    if openai_api_key == "寄":
         # 没有配置openai_api_key
         await openai_text.finish("请先配置openai_api_key")
     prompt = msg.extract_plain_text()                               # 获取文本
@@ -229,7 +229,7 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
     ):                                                                          # 超过cd时间或者是超级用户
         # 记录cd
         openai_cd_dir.update({qid: event.time})
-        await openai_text.send(MessageSegment.text("让本喵想想吧..."))        # 发送消息
+        await openai_text.send(MessageSegment.text(f"让{Bot_NICKNAME}想想吧..."))        # 发送消息
         loop = asyncio.get_event_loop()                                # 获取事件循环
         try:
             # 开一个不会阻塞asyncio的线程调用get_openai_reply函数
@@ -241,6 +241,6 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
     else:
         await openai_text.finish(
             MessageSegment.text(
-                f"让本喵的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
+                f"让{Bot_NICKNAME}的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
             at_sender=True
         )
