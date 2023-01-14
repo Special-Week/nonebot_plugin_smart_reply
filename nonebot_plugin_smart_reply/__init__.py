@@ -16,13 +16,6 @@ from nonebot.adapters.onebot.v11 import (
 )
 
 
-try:
-    cd_time = nonebot.get_driver().config.openai_cd_time
-except:
-    cd_time = 60        # 默认cd时间为60秒
-
-openai_cd_dir = {}  # 用于存放cd时间
-
 # 添加和删除关键词
 add_new = on_regex(
     r"^添加关键词\s*(\S+.*?)\s*答\s*(\S+.*?)\s*$",
@@ -183,8 +176,8 @@ async def _(event: MessageEvent):
             message = await qinyun_reply(qinyun_url)
             logger.info("来自青云客的智能回复: " + message)
         else:
-            xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={apiKey}"
-            if apiKey == "寄":
+            xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={xiaoai_api_key}"
+            if xiaoai_api_key == "寄":
                 await ai.finish("小爱同学apiKey未设置, 请联系SUPERUSERS在.env中设置")
             message = await xiaoice_reply(xiaoai_url)
             if message == "寄":
@@ -211,7 +204,7 @@ async def _poke_event(event: PokeNotifyEvent):
 
 @openai_text.handle()
 async def _(event: MessageEvent, msg: Message = CommandArg()):
-    if api_key == "寄":
+    if openai_api_key == "寄":
         # 没有配置openai_api_key
         await openai_text.finish("请先配置openai_api_key")
     prompt = msg.extract_plain_text()                               # 获取文本
