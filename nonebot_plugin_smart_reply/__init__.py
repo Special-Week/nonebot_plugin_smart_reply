@@ -222,7 +222,7 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
     ):                                                                          # 超过cd时间或者是超级用户
         # 记录cd
         openai_cd_dir.update({qid: event.time})
-        await openai_text.send(MessageSegment.text("让本喵想想吧..."))        # 发送消息
+        await openai_text.send(MessageSegment.text(f"让{Bot_NICKNAME}想想吧..."))        # 发送消息
         loop = asyncio.get_event_loop()                                # 获取事件循环
         try:
             # 开一个不会阻塞asyncio的线程调用get_openai_reply函数
@@ -234,6 +234,6 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
     else:
         await openai_text.finish(
             MessageSegment.text(
-                f"让本喵的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
+                f"让{Bot_NICKNAME}的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
             at_sender=True
         )
