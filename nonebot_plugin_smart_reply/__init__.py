@@ -8,12 +8,12 @@ from nonebot.permission import SUPERUSER
 from nonebot.params import CommandArg, RegexGroup, ArgPlainText
 from nonebot.plugin.on import on_message, on_notice, on_command, on_regex
 from nonebot.adapters.onebot.v11 import (
-    GroupMessageEvent,
-    PrivateMessageEvent,
     Message,
     MessageEvent,
+    MessageSegment,
     PokeNotifyEvent,
-    MessageSegment
+    GroupMessageEvent,
+    PrivateMessageEvent
 )
 
 
@@ -151,7 +151,6 @@ async def _():
 async def _(event: MessageEvent):
     # 配置私聊不启用后，私聊信息直接结束处理
     if not reply_private and isinstance(event, PrivateMessageEvent):
-        await ai.finish()
         return
     # 获取消息文本
     msg = str(event.get_message())
@@ -195,7 +194,7 @@ async def _(event: MessageEvent):
 
 
 @poke_.handle()
-async def _poke_event(event: PokeNotifyEvent):
+async def _(event: PokeNotifyEvent):
     if event.is_tome:
         # 50%概率回复莲宝的藏话
         if random.random() < 0.5:
@@ -235,9 +234,13 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
             # 开一个不会阻塞asyncio的线程调用get_openai_reply函数
             res = await loop.run_in_executor(None, get_openai_reply, prompt)
         except Exception as e:                                        # 如果出错
-            await openai_text.finish(str(e))                       # 发送错误信息
-        # 发送结果
-        await openai_text.finish(MessageSegment.text(res), at_sender=True)
+            await openai_text.finish("Error: " + str(e))                       # 发送错误信息
+        # 发送结果, 长消息根据账号可能会报错风控, 这里try一下, 不行就发送图片
+        try:
+            await openai_text.send(MessageSegment.text(res), at_sender=True)
+        except:
+            await openai_text.send("文本消息被风控了, 这里咱尝试把文字写在图片上发送了"+MessageSegment.image(text_to_png(res)))
+        # 图片都发不出去那没办法了
     else:
         await openai_text.finish(
             MessageSegment.text(

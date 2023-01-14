@@ -4,12 +4,14 @@ import random
 import openai
 import nonebot
 from pathlib import Path
+from httpx import AsyncClient
 from .txtToImg import txt_to_img
+
 try:
     import ujson as json
 except ModuleNotFoundError:
     import json
-from httpx import AsyncClient
+
 
 
 config = nonebot.get_driver().config
@@ -132,10 +134,10 @@ def get_openai_reply(prompt: str) -> str:
         presence_penalty=0.0
     )
     res = response.choices[0].text
-    # 移除所有开头的\n
+    # 去除开头的换行符
     while res.startswith("\n"):
         res = res[1:]
-    return res
+    return "\n" + res
 
 
 
