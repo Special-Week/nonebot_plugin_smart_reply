@@ -182,6 +182,8 @@ async def _(event: MessageEvent):
             message = await qinyun_reply(qinyun_url)
             logger.info("来自青云客的智能回复: " + message)
         else:
+            # 去除消息中的空格, 不知道为什么, 如果消息中存在空格, 这个 api 大概率会返回空字符
+            msg = msg.replace(" ", "")
             xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={xiaoai_api_key}"
             if xiaoai_api_key == "寄":
                 await ai.finish("小爱同学apiKey未设置, 请联系SUPERUSERS在.env中设置")
@@ -196,14 +198,18 @@ async def _(event: MessageEvent):
 @poke_.handle()
 async def _(event: PokeNotifyEvent):
     if event.is_tome:
-        # 50%概率回复莲宝的藏话
-        if random.random() < 0.5:
+        probability = random.random() # 生成0-1之间的随机数
+        # 33%概率回复莲宝的藏话
+        if probability < 0.33:
             # 发送语音需要配置ffmpeg, 这里try一下, 不行就随机回复poke__reply的内容
             try:
                 await poke_.send(MessageSegment.record(Path(aac_file_path)/random.choice(aac_file_list)))
             except:
                 await poke_.send(message=f"{random.choice(poke__reply)}")
-        # 随机回复poke__reply的内容
+        elif probability > 0.66:
+            # 33% 概率戳回去
+            await poke_.send(Message(f"[CQ:poke,qq={event.user_id}]"))
+        # probability在0.33和0.66之间的概率回复poke__reply的内容
         else:
             await poke_.send(message=f"{random.choice(poke__reply)}")
 
