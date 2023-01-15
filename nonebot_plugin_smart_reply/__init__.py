@@ -73,6 +73,14 @@ api_switch = on_command(
     rule=to_me(),
     block=True
 )
+# 切换 setu api
+setu_switch = on_command(
+    "setu切换",
+    aliases={"切换setu", "setu_switch", "涩图api切换"},
+    permission=SUPERUSER,
+    rule=to_me(),
+    block=True
+)
 # 优先级99, 条件: 艾特bot就触发
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
@@ -149,7 +157,11 @@ async def _():
     global api_flag
     api_flag = not api_flag
     await api_switch.send(message=f"切换成功, 当前智能回复api为{'青云客' if api_flag else '小爱同学'}")
-
+@setu_switch.handle()
+async def _():
+    global setu_flag
+    setu_flag = not api_flag
+    await setu_switch.send(message=f"切换成功, 当前图片api为{'MirlKoi' if api_flag else 'Pixiv'}")
 
 @ai.handle()
 async def _(event: MessageEvent):
