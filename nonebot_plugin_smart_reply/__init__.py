@@ -1,4 +1,5 @@
 import asyncio
+import requests
 from .utils import *
 from typing import Tuple
 from loguru import logger
@@ -8,6 +9,7 @@ from nonebot.permission import SUPERUSER
 from nonebot.params import CommandArg, RegexGroup, ArgPlainText
 from nonebot.plugin.on import on_message, on_notice, on_command, on_regex
 from nonebot.adapters.onebot.v11 import (
+    Bot,
     Message,
     MessageEvent,
     MessageSegment,
@@ -61,6 +63,8 @@ del_new_list = on_regex(
 )
 # 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
 api_flag = True
+# 这个值为True时, 使用的是 MirlKoi 图片
+setu_flag = True
 # 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
 api_switch = on_command(
     "智障回复api切换",
@@ -72,7 +76,7 @@ api_switch = on_command(
 # 优先级99, 条件: 艾特bot就触发
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
-poke_ = on_notice(rule=to_me(), block=False)
+poke = on_notice(rule=to_me(), block=False)
 # 使用openai的接口, 优先级5
 openai_text = on_command(
     "求助", aliases={"请问", "帮忙"}, block=True, priority=5, rule=to_me())
@@ -182,6 +186,9 @@ async def _(event: MessageEvent):
             message = await qinyun_reply(qinyun_url)
             logger.info("来自青云客的智能回复: " + message)
         else:
+            # 去除空格，否则这个 api 容易返回空信息
+            msg = msg.replace(' ', '')
+            logger.debug("传入的信息为{}".format(msg))
             xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={xiaoai_api_key}"
             if xiaoai_api_key == "寄":
                 await ai.finish("小爱同学apiKey未设置, 请联系SUPERUSERS在.env中设置")
@@ -193,19 +200,37 @@ async def _(event: MessageEvent):
     await ai.finish(Message(result))
 
 
-@poke_.handle()
-async def _(event: PokeNotifyEvent):
+@poke.handle()
+async def _(bot: Bot, event: PokeNotifyEvent):
     if event.is_tome:
-        # 50%概率回复莲宝的藏话
-        if random.random() < 0.5:
-            # 发送语音需要配置ffmpeg, 这里try一下, 不行就随机回复poke__reply的内容
+        probability = random.random()
+        # 20% 概率发送图片
+        if probability < 0.20:
+            if setu_flag:
+                res = requests.get('https://iw233.cn/api.php?sort=random&type=json').json()
+                pic_url = res["pic"][0]
+                message="别戳了别戳了,这张图给你了,让我安静一会儿,60秒后我要撤回\n" + MessageSegment.image(file=pic_url)
+            else:
+                pic = await get_setu()
+                message="别戳了别戳了,这张setu给你了,让我安静一会儿,60秒后我要撤回\n" + Message(pic[1]) + Message(pic[0])
+            setu_msg_id = await poke.send(message)
+            setu_msg_id = setu_msg_id['message_id']
+            await asyncio.sleep(60)
+            await bot.delete_msg(message_id=setu_msg_id)
+            return
+        # 25% 概率回复 ".resource/audio" 目录下的 *.aac 语音
+        elif probability < 0.45:
+            # 发送语音需要配置ffmpeg, 不行就随机回复poke_reply的内容
             try:
-                await poke_.send(MessageSegment.record(Path(aac_file_path)/random.choice(aac_file_list)))
+                await poke.send(MessageSegment.record(Path(aac_file_path)/random.choice(aac_file_list)))
             except:
-                await poke_.send(message=f"{random.choice(poke__reply)}")
-        # 随机回复poke__reply的内容
+                await poke.send(message=f"{random.choice(poke_reply)}")
+        # 20% 概率戳回去
+        elif probability < 0.65:
+            await poke.send(Message(f"[CQ:poke,qq={event.user_id}]"))
+        # 35% 概率回复戳一戳文本
         else:
-            await poke_.send(message=f"{random.choice(poke__reply)}")
+            await poke.send(message=f"{random.choice(poke_reply)}")
 
 
 @openai_text.handle()
