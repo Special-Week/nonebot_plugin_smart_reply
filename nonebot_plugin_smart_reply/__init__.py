@@ -70,6 +70,7 @@ su_help = on_command("su_help", priority=10, block=True)        # 消息转发�
 release_count = on_command("释放违规",aliases={"解禁bing"}, permission=SUPERUSER, priority=1, block=True)      # 释放用户违规次数
 add_blacklist = on_command("添加黑名单", permission=SUPERUSER, priority=1, block=True)      # 添加黑名单(全局)
 del_blacklist = on_command("删除黑名单", permission=SUPERUSER, priority=1, block=True)      # 删除黑名单(全局)
+updata_bingCookie = on_command("更新bingCookie", aliases={"update_bing","cookie_bing"},permission=SUPERUSER, priority=1, block=True)      # 更新bingCookie
 # 优先级99, 条件: 艾特bot就触发
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
@@ -246,7 +247,7 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
     if uid in ban_list:         # 如果用户在黑名单中, 则直接返回
         await bingchat.finish(f"阈值大于{THRESHOLD}, 你已被ban, 请通过bot联系SUPERUSER, su会根据数据库记录的信息自行决定是否清空count, 命令头“su_help”, 后接内容\n别重复发, 要是不断通过bot转发给su, 该用户所有事件将永久禁用, 群聊也会退出", at_sender=True)
     msg: str = msg.extract_plain_text()     # 获取消息
-    if cookies == {}:       # 如果cookies为空, 则直接返回
+    if cookies == []:       # 如果cookies为空, 则直接返回
         await bingchat.finish("cookie未设置, 无法访问")
     if (msg.isspace() or msg == ""):        # 如果消息为空, 则直接返回
         await bingchat.finish("请告诉我你要交流什么", at_sender=True)
@@ -329,6 +330,15 @@ async def _(msg: Message = CommandArg()):
     save_user_info()
     await release_count.finish("已清空该用户的违规次数")
 
+@updata_bingCookie.handle()
+async def _():
+    """更新bingCookie"""
+    cookies.clear()
+    cookies.extend(json.load(open("data/smart_reply/cookie.json", "r", encoding="utf8")))
+    """更新chat_dict"""
+    chat_dict.clear()
+    chat_dict.update({}) # 重置chat_dict
+    await updata_bingCookie.finish("已更新bingCookie")
 
 @event_preprocessor
 async def event_preblock(event: Event, bot: Bot):

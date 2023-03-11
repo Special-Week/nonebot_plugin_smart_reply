@@ -31,10 +31,10 @@ SQLITT_PATH: str = 'data/smart_reply/req_data.db'
 chat_dict: dict = {}
 # 初始化cookies
 try:
-    cookies: dict = json.load(open("data/smart_reply/cookie.json", "r", encoding="utf8"))
+    cookies: list = json.load(open("data/smart_reply/cookie.json", "r", encoding="utf8"))
 except:
     logger.info("cookies.json不存在, 初始化失败")
-    cookies: dict = {}
+    cookies: list = []
 # 获取超级用户
 SU_LIST: list = list(nonebot.get_driver().config.superusers)
 

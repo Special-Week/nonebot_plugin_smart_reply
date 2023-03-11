@@ -115,6 +115,7 @@
     2. 首先你需要一个通过申请的账号, 使用edge浏览器安装"editthiscookie"浏览器插件或者相关其他获取cookie的插件. 然后进入"bing.com/chat"登录通过的账号
     3. 右键界面选择"editthiscookie", 找到一个看上去像出门的样子的图标"导出cookie", cookie一般就能在你的剪贴板
     4. 打开你bot项目文件夹, 依次进入data/smart_reply, 没有就新建, 在bot/data/smart_reply目录下新建文件"cookie.json", 打开把你的cookie内容复制进去
+    5. 当cookie失效后, cookie.json文件更新后, 发送update_bing | cookie_bing即可热更新
 
 
     用法:
