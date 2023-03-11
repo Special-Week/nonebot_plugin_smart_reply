@@ -127,9 +127,12 @@
         7. 防止又弔人用su_help功能烦superuser, 增加了一个响应器"添加黑名单", 后跟参数qq号, 使用后该用户的消息事件与通知事件均无视, 包括其他插件的响应器
         8. 相对应的, 当然准备了"删除黑名单" 这个响应器用来接触, 黑名单数据存储在插件目录下的resource/json/blacklist.json下, 请注意与上面讲的用户违规记录是不一样的
         
+    项目使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
 
 
 ## 会有人需要教命令行如何科学上网吗?:
 
     1. 利用v2rayN等工具开启本地监听端口(一般高位端口任意设置, 下面用port代替你说设置的)
     2. 环境变量增加all_proxy变量, 协议是socks那值就是socks5://127.0.0.1:port, 是http那么值就是http://127.0.0.1:port
+
+
