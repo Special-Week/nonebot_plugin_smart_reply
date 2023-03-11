@@ -5,10 +5,15 @@ from loguru import logger
 from nonebot.rule import to_me
 from nonebot.matcher import Matcher
 from nonebot.permission import SUPERUSER
+from nonebot.message import event_preprocessor
+from nonebot.exception import IgnoredException
 from nonebot.params import CommandArg, RegexGroup, ArgPlainText
 from nonebot.plugin.on import on_message, on_notice, on_command, on_regex
 from nonebot.adapters.onebot.v11 import (
+    Bot,
+    Event,
     Message,
+    NotifyEvent,
     MessageEvent,
     MessageSegment,
     PokeNotifyEvent,
@@ -59,16 +64,12 @@ del_new_list = on_regex(
     rule=to_me(),
     permission=SUPERUSER,
 )
-# 这个值为False时, 使用的是小爱同学, True时使用的是青云客api
-api_flag = True
-# 优先级1, 向下阻断, 需要艾特bot, 智能回复api切换指令, 目前有俩api, 分别是qinyunke_api和小爱同学, 默认qinyun
-api_switch = on_command(
-    "智障回复api切换",
-    aliases={"ai切换", "api_switch", "智能回复api切换"},
-    permission=SUPERUSER,
-    rule=to_me(),
-    block=True
-)
+bingchat = on_command("bing", priority=10, block=True)      # bing主要的响应器
+reserve = on_command("重置会话", priority=10, block=True)       # 重置会话
+su_help = on_command("su_help", priority=10, block=True)        # 消息转发给su
+release_count = on_command("释放违规",aliases={"解禁bing"}, permission=SUPERUSER, priority=1, block=True)      # 释放用户违规次数
+add_blacklist = on_command("添加黑名单", permission=SUPERUSER, priority=1, block=True)      # 添加黑名单(全局)
+del_blacklist = on_command("删除黑名单", permission=SUPERUSER, priority=1, block=True)      # 删除黑名单(全局)
 # 优先级99, 条件: 艾特bot就触发
 ai = on_message(rule=to_me(), priority=99, block=False)
 # 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
@@ -140,11 +141,6 @@ async def _(
         await del_new_list.finish("删除成功~")
 
 
-@api_switch.handle()
-async def _():
-    global api_flag
-    api_flag = not api_flag
-    await api_switch.send(message=f"切换成功, 当前智能回复api为{'青云客' if api_flag else '小爱同学'}")
 
 
 @ai.handle()
@@ -177,20 +173,9 @@ async def _(event: MessageEvent):
     result = await get_chat_result(msg,  nickname)
     # 如果词库没有结果，则调用api获取智能回复
     if result == None:
-        if api_flag:
-            qinyun_url = f"http://api.qingyunke.com/api.php?key=free&appid=0&msg={msg}"
-            message = await qinyun_reply(qinyun_url)
-            logger.info("来自青云客的智能回复: " + message)
-        else:
-            # 去除消息中的空格, 不知道为什么, 如果消息中存在空格, 这个 api 大概率会返回空字符
-            msg = msg.replace(" ", "")
-            xiaoai_url = f"https://apibug.cn/api/xiaoai/?msg={msg}&apiKey={xiaoai_api_key}"
-            if xiaoai_api_key == "寄":
-                await ai.finish("小爱同学apiKey未设置, 请联系SUPERUSERS在.env中设置")
-            message = await xiaoice_reply(xiaoai_url)
-            if message == "寄":
-                await ai.finish("小爱同学apiKey错误, 请联系SUPERUSERS在.env中重新设置")
-            logger.info("来自小爱同学的智能回复: " + message)
+        qinyun_url = f"http://api.qingyunke.com/api.php?key=free&appid=0&msg={msg}"
+        message = await qinyun_reply(qinyun_url)
+        logger.info("来自青云客的智能回复: " + message)
         await ai.finish(message=message)
     await ai.finish(Message(result))
 
@@ -253,3 +238,143 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
                 f"让{Bot_NICKNAME}的脑子休息一下好不好喵, {cd_time - cd:.0f}秒后才能再次使用"),   # 发送cd时间
             at_sender=True
         )
+
+
+@bingchat.handle()
+async def _(event: MessageEvent, msg: Message = CommandArg()):
+    uid = event.get_user_id()     # 获取用户id
+    if uid in ban_list:         # 如果用户在黑名单中, 则直接返回
+        await bingchat.finish(f"阈值大于{THRESHOLD}, 你已被ban, 请通过bot联系SUPERUSER, su会根据数据库记录的信息自行决定是否清空count, 命令头“su_help”, 后接内容\n别重复发, 要是不断通过bot转发给su, 该用户所有事件将永久禁用, 群聊也会退出", at_sender=True)
+    msg: str = msg.extract_plain_text()     # 获取消息
+    if cookies == {}:       # 如果cookies为空, 则直接返回
+        await bingchat.finish("cookie未设置, 无法访问")
+    if (msg.isspace() or msg == ""):        # 如果消息为空, 则直接返回
+        await bingchat.finish("请告诉我你要交流什么", at_sender=True)
+    if uid not in chat_dict:                # 如果用户不在会话字典中, 则创建会话
+        _ = await new_chat_(uid)            # 创建会话
+        await bingchat.send("新会话已创建, 请稍等, 当前模式creative, 如要切换对话样式请发送“重置会话”， 并附带参数 balanced 或者 creative 或 precise",at_sender=True)
+    bot: Chatbot = chat_dict[uid]["Chatbot"]        # 获取用户的Chatbot
+    style: str = chat_dict[uid]["model"]            # 获取用户的对话模式
+
+    try:                                            # 从头try到尾
+        data = await bot.ask(prompt=msg, conversation_style=style)      # 获取响应, 这一部分是最耗时的
+        if data["item"]["result"]["value"]!="Success":                  # 如果返回的结果不是Success, 则直接返回
+            await bingchat.send("返回Error: " + data["item"]["result"]["value"], at_sender=True)
+            return
+        throttling = data["item"]["throttling"]             # 获取限制信息
+        maxConversation = throttling["maxNumUserMessagesInConversation"]            # 获取最大对话数
+        currentConversation = throttling["numUserMessagesInConversation"]           # 获取当前对话数
+        if len(data["item"]["messages"]) < 2:                                       # 如果返回的消息长度小于2, 那么他没回答你消息, 很可能是被掐断了
+            await bingchat.send("Error, 该对话已中断, 可能已被bing切断, 已帮你重置会话", at_sender=True)
+            _ = await new_chat_(user_id = uid)             # 重置会话并且return
+            return
+        if "text" not in data["item"]["messages"][1]:                          # 如果返回的消息中没有text, 那么他没回答你消息, 很可能是你问了敏感问题
+            if uid in user_info:                                    # 如果用户在用户信息中, 则将用户的违规次数+1
+                user_info[uid]["violation"] += 1
+            else:                                        # 如果用户不在用户信息中, 则创建用户信息, 并且将用户的违规次数设置为1
+                user_info[uid] = {"violation": 1} 
+            save_user_info()                                # 持久存储用户信息
+            count = user_info[uid]["violation"]         # 获取用户的违规次数
+            if count > THRESHOLD:                       # 如果用户的违规次数大于阈值, 则将用户加入黑名单
+                ban_list.append(uid)            
+            await bingchat.send(data["item"]["messages"][1]["adaptiveCards"][0]["body"][0]["text"], at_sender=True)     # 发送一条text, 一般是违规内容固定的回答
+            await bingchat.send(f"bot好像检测到你问了敏感问题, 已被记录次数, 超过阈值({THRESHOLD})会被禁用该功能请注意当前count = {count}\n如被ban想解封请通过bot转发给SUPERUSER, su会根据数据库记录的信息自行决定是否清空count, 命令头“su_help”, 后接内容\n要是不断通过bot转发给su, 该用户将永久禁用, 群聊也会退出",at_sender=True) # 提示消息
+            await push_sql(user_id = uid, user_name = event.sender.nickname, content=msg, isrational=False)   # 将用户的违规信息存入数据库, 并且return
+            return
+        await push_sql(user_id = uid, user_name = event.sender.nickname, content=msg, isrational=True)      # 将用户的正常信息存入数据库
+        if maxConversation > currentConversation:       # 没超过最大上限, 直接发送
+            await bingchat.send(data["item"]["messages"][1]["text"] + f"\n\n当前{currentConversation} 共 {maxConversation}", at_sender=True)
+        else:                                    # 超过最大上限, 发送并且重置会话
+            await bingchat.send(data["item"]["messages"][1]["text"]+ f"\n\n当前{currentConversation} 共 {maxConversation}", at_sender=True) 
+            _ = await new_chat_(event.get_user_id())
+            await bingchat.send("达到对话上限, 已自动重置会话", at_sender=True)
+    except Exception as e:      # 如果出现异常, 则直接发送报错信息, 防止bot无反应
+        await bingchat.send("Error: " + str(e), at_sender=True)
+
+
+@reserve.handle()
+async def _(event: MessageEvent,msg: Message = CommandArg()):
+    """重置会话"""
+    user_id = event.get_user_id()       # 获取用户id
+    msg: str = msg.extract_plain_text()     # 获取参数
+    if msg not in ["balanced", "creative", "precise"]:      # 如果参数不在这三个中, 则直接重置会话
+        _ = await new_chat_(user_id=user_id)    # 重置会话
+        await reserve.finish("缺少参数或参数错误, 请使用 balanced 或者 creative 或 precise, 这里只能默认给你重置成creative")
+    else:
+        await reserve.finish(await new_chat_(user_id, msg))  # 重置会话并且返回结果
+
+
+@su_help.handle()
+async def _(bot:Bot,event: MessageEvent, msg: Message = CommandArg()):
+    """转发给su"""
+    uid = event.get_user_id()
+    msg = msg.extract_plain_text()
+    reply = f"来自{uid}的消息: {msg}"
+    if isinstance(event,GroupMessageEvent): # 如果是群聊, 则获取群号加到后面
+        gid = str(event.group_id)
+        reply+=f"\n来自群{gid}"
+    su = SU_LIST[0]
+    await bot.send_private_msg(user_id=su, message=reply)
+    await su_help.finish("已转发给su, 请耐心等待回复, 请勿重复发送, 重复发送直接ban")
+    
+
+@release_count.handle()
+async def _(msg: Message = CommandArg()):
+    """清空用户的违规次数"""
+    msg = msg.extract_plain_text()
+    if msg not in ban_list:
+        await release_count.finish("该用户不存在")
+    user_info[msg]["violation"] = 0
+    ban_list.remove(msg)
+    save_user_info()
+    await release_count.finish("已清空该用户的违规次数")
+
+
+@event_preprocessor
+async def event_preblock(event: Event, bot: Bot):
+    """事件预处理器，阻断黑名单用户的事件"""
+    if isinstance(event, MessageEvent) or isinstance(event, NotifyEvent):
+        """阻断黑名单用户的消息事件和通知事件"""
+        if not event.get_user_id() in bot.config.superusers:        # 超级用户不受限制
+            if event.get_user_id() in blackdata["user"]:            # 如果用户在黑名单中, 则阻断
+                blockreason = "user in blacklist"                   # 阻断原因
+                logger.info(f'当前事件已阻断，原因：{blockreason}')   # 记录日志
+                raise IgnoredException(blockreason)                 # 抛出异常(阻断事件)
+
+
+@add_blacklist.handle()
+async def _(msg: Message = CommandArg()):
+    """添加黑名单"""
+    msg: str = msg.extract_plain_text()     # 获取参数
+    if msg.isspace() or msg == "":      # 如果参数为空, 则返回错误
+        await add_blacklist.finish("参数错误")
+    if msg.isdigit():               # 如果参数是数字, 则添加到黑名单
+        blackdata["user"].append(msg)
+    else:                        # 如果参数不是数字, 则返回错误
+        await add_blacklist.finish("参数错误")
+    await add_blacklist.send(f"id{msg}添加成功")
+    with open(Path(__file__).parent.joinpath('blacklist.json'), "w", encoding="utf8") as f_new:
+        json.dump(blackdata, f_new, ensure_ascii=False, indent=4)   # 将黑名单数据写入文件
+
+
+
+
+@del_blacklist.handle()
+async def _(msg: Message = CommandArg()):
+    """删除黑名单"""
+    msg: str = msg.extract_plain_text()   # 获取参数
+    if msg.isspace() or msg == "":  # 如果参数为空, 则返回错误
+        await del_blacklist.finish("参数错误")
+    if msg.isdigit():   # 如果参数是数字, 则尝试删除黑名单
+        try:    
+            blackdata["user"].remove(msg)
+        except ValueError:
+            value = str(blackdata["user"])
+            await del_blacklist.finish("参数错误, 列表中只存在:" + value)
+    else:
+        await del_blacklist.finish("参数错误")
+    await del_blacklist.send("删除成功")
+    with open(Path(__file__).parent.joinpath('blacklist.json'), "w", encoding="utf8") as f_new:
+        json.dump(blackdata, f_new, ensure_ascii=False, indent=4)
+
+                  

@@ -1,9 +1,13 @@
 import os
 import re
+import time
 import random
 import openai
 import nonebot
+import sqlite3
 from pathlib import Path
+from loguru import logger
+from EdgeGPT import Chatbot
 from httpx import AsyncClient
 from .txtToImg import txt_to_img
 
@@ -11,8 +15,6 @@ try:
     import ujson as json
 except ModuleNotFoundError:
     import json
-
-
 
 config = nonebot.get_driver().config
 xiaoai_api_key: str = getattr(config, "xiaoai_apikey", "寄")
@@ -22,6 +24,83 @@ reply_private: bool = getattr(config, "ai_reply_private", False)
 openai_api_key: str = getattr(config, "openai_api_key", "寄")
 max_tokens: int = getattr(config, "openai_max_tokens", 1000)
 cd_time: int = getattr(config, "openai_cd_time", 60)
+
+# 数据库路径
+SQLITT_PATH: str = 'data/smart_reply/req_data.db'
+# 会话字典，用于存储会话   {"user_id": {"Chatbot": bot,"model":  balanced or creative or precise}}
+chat_dict: dict = {}
+# 初始化cookies
+try:
+    cookies: dict = json.load(open("data/smart_reply/cookie.json", "r", encoding="utf8"))
+except:
+    logger.info("cookies.json不存在, 初始化失败")
+    cookies: dict = {}
+# 获取超级用户
+SU_LIST: list = list(nonebot.get_driver().config.superusers)
+
+
+
+def initSomething() -> None:
+    """初始化一些东西"""
+    if not os.path.exists("data/smart_reply"):
+        os.makedirs("data/smart_reply")            # 创建文件夹
+    conn = sqlite3.connect(SQLITT_PATH)         # 数据库初始化
+    c = conn.cursor()
+    try:
+        c.execute(
+            "CREATE TABLE main (user_id text, user_name text, content text, time text, isrational bool)")
+        conn.commit()
+    except:
+        logger.info("数据库已存在")
+    conn.close()
+initSomething()
+
+
+# 获取挑战敏感问题的次数, 超过阈值会被禁用该功能
+THRESHOLD = 5       # 阈值
+if os.path.exists("./data/smart_reply/user_info.json"):  # 读取用户数据
+    with open("data/smart_reply/user_info.json", "r", encoding="utf-8") as f:
+        user_info: dict = json.load(f)
+else: 
+    user_info: dict = {}
+    with open("data/smart_reply/user_info.json", "w", encoding="utf-8") as f:
+        json.dump(user_info, f, indent=4)
+# json结构  {"user_id": {"violation": 0}}
+
+
+# 初始化获取violation大于阈值的用户
+ban_list: list = []
+for user_id, user_data in user_info.items():
+    if user_data["violation"] > THRESHOLD:
+        ban_list.append(user_id)
+
+# 获取黑名单
+blackdata: dict = json.load(open(Path(__file__).parent.joinpath(
+    'resource/json/blacklist.json'), "r", encoding="utf8"))
+
+
+def save_user_info() -> None:
+    """保存用户数据"""
+    with open("data/smart_reply/user_info.json", "w", encoding="utf-8") as f:
+        json.dump(user_info, f, indent=4)
+
+async def new_chat_(user_id: str, style: str = "creative") -> str:
+    """重置会话"""
+    bot = Chatbot(cookies=cookies)
+    chat_dict.update({user_id: {"Chatbot": bot, "model": style}})
+    return f"重置会话成功, bot: {str(bot)}, model: {style}"
+
+async def push_sql(user_id: str, user_name, content: str, isrational: bool) -> None:
+    """sql插入, 记录用户请求"""
+    user_name = user_name.replace("'", "")
+    content = content.replace("'", "")
+    conn = sqlite3.connect(SQLITT_PATH)
+    c = conn.cursor()
+    c.execute("INSERT INTO main VALUES (?,?,?,?,?)", (user_id, user_name, content,
+              time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), isrational))
+    conn.commit()
+    conn.close()
+
 
 # 载入词库(这个词库有点涩)
 AnimeThesaurus = json.load(open(Path(__file__).parent.joinpath(
@@ -88,16 +167,6 @@ async def qinyun_reply(url: str) -> str:
         if have_url(res):
             res = Bot_NICKNAME + "暂时听不懂主人说的话呢"
         return res
-
-
-async def xiaoice_reply(url: str) -> str:
-    """从小爱同学api拿到消息, 这个api私货比较少"""
-    async with AsyncClient() as client:
-        res = (await client.get(url)).json()
-        if res["code"] == 200:
-            return (res["text"]).replace("小爱", Bot_NICKNAME)
-        else:
-            return "寄"
 
 
 def have_url(s: str) -> bool:
