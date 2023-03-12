@@ -29,7 +29,7 @@ cd_time: int = getattr(config, "openai_cd_time", 60)
 SQLITT_PATH: str = 'data/smart_reply/req_data.db'
 # 会话字典，用于存储会话   {"user_id": {"Chatbot": bot,"model":  balanced or creative or precise}}
 chat_dict: dict = {}
-# 初始化cookies
+# 初始化cookies, 注意这个cookies是一个长这样的列表[{},{},{}]
 try:
     cookies: list = json.load(open("data/smart_reply/cookie.json", "r", encoding="utf8"))
 except:

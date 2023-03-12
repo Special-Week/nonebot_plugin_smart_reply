@@ -114,8 +114,8 @@
     1. 使用new bing必须配置cookie, 这个cookie内容过多不适合在.env, 所以这个cookie将会与json文件的形式进行配置
     2. 首先你需要一个通过申请的账号, 使用edge浏览器安装"editthiscookie"浏览器插件或者相关其他获取cookie的插件. 然后进入"bing.com/chat"登录通过的账号
     3. 右键界面选择"editthiscookie", 找到一个看上去像出门的样子的图标"导出cookie", cookie一般就能在你的剪贴板
-    4. 打开你bot项目文件夹, 依次进入data/smart_reply, 没有就新建, 在bot/data/smart_reply目录下新建文件"cookie.json", 打开把你的cookie内容复制进去
-    5. 当cookie失效后, cookie.json文件更新后, 发送update_bing | cookie_bing即可热更新
+    4. 打开你bot项目文件夹, 依次进入data/smart_reply, 没有就新建, 在bot/data/smart_reply目录下新建文件"xxx.json", 有多个账号可以放多个cookie文件, 打开把你的cookie内容复制进去
+    5. 初始化默认读取"cookie.json", 也可以通过发送update_bing | cookie_bing xxx 来指定bot/data/smart_reply目录下的json文件, 假如你文件夹内有cookie1.json   cookie2.json   cookie3.json,  发送update_bing cookie3, 即可切换到指定的cookie
 
 
     用法:
@@ -128,7 +128,7 @@
         7. 防止又弔人用su_help功能烦superuser, 增加了一个响应器"添加黑名单", 后跟参数qq号, 使用后该用户的消息事件与通知事件均无视, 包括其他插件的响应器
         8. 相对应的, 当然准备了"删除黑名单" 这个响应器用来接触, 黑名单数据存储在插件目录下的resource/json/blacklist.json下, 请注意与上面讲的用户违规记录是不一样的
         
-    项目使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
+    使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
 
 
 ## 会有人需要教命令行如何科学上网吗?:

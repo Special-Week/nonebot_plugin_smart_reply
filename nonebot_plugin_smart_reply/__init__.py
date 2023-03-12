@@ -331,14 +331,25 @@ async def _(msg: Message = CommandArg()):
     await release_count.finish("已清空该用户的违规次数")
 
 @updata_bingCookie.handle()
-async def _():
+async def _(msg: Message = CommandArg()):
+    msg: str = msg.extract_plain_text()
+    if msg.isspace() or msg == "":
+        await updata_bingCookie.finish("需要指定cookie")
     """更新bingCookie"""
     cookies.clear()
-    cookies.extend(json.load(open("data/smart_reply/cookie.json", "r", encoding="utf8")))
+    # 如果data/smart_reply/msg.json存在则读取
+    if os.path.exists("data/smart_reply/"+msg+".json"):
+        cookies.extend(json.load(open("data/smart_reply/"+msg+".json", "r", encoding="utf8")))
+    else:
+        # 获取json结尾的文件
+        files = [file for file in os.listdir("data/smart_reply/") if file.endswith(".json")]
+        await updata_bingCookie.finish(f"文件不存在, 当前可供选择的文件有:{str(files)}")
     """更新chat_dict"""
     chat_dict.clear()
     chat_dict.update({}) # 重置chat_dict
     await updata_bingCookie.finish("已更新bingCookie")
+
+
 
 @event_preprocessor
 async def event_preblock(event: Event, bot: Bot):
