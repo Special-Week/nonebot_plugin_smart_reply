@@ -33,7 +33,7 @@ chat_dict: dict = {}
 try:
     cookies: list = json.load(open("data/smart_reply/cookie.json", "r", encoding="utf8"))
 except:
-    logger.info("cookies.json不存在, 初始化失败")
+    logger.info("cookie.json不存在, 初始化失败")
     cookies: list = []
 # 获取超级用户
 SU_LIST: list = list(nonebot.get_driver().config.superusers)
@@ -188,6 +188,21 @@ def have_url(s: str) -> bool:
 def text_to_png(msg: str) -> bytes:
     """文字转png"""
     return txt_to_img(msg)
+
+
+def swap_string_positions(input_string: str) -> str:
+    """处理一下bing返回的字符串"""
+    input_string = re.sub(r'\[\^(\d+)\^\]', '', input_string)
+    regex = r"\[\d+\]:"
+    matches = re.findall(regex, input_string)
+    if not matches:
+        return input_string
+    positions = [(match.start(), match.end()) for match in re.finditer(regex, input_string)]
+    end = input_string.find("\n", positions[len(positions)-1][1])
+    target = input_string[end:] +"\n\n"+ input_string[:end]
+    while target[0] == "\n":
+        target = target[1:]
+    return target
 
 
 def get_openai_reply(prompt: str) -> str:

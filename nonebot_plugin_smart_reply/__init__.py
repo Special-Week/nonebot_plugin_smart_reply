@@ -284,9 +284,9 @@ async def _(event: MessageEvent, msg: Message = CommandArg()):
             return
         await push_sql(user_id = uid, user_name = event.sender.nickname, content=msg, isrational=True)      # 将用户的正常信息存入数据库
         if maxConversation > currentConversation:       # 没超过最大上限, 直接发送
-            await bingchat.send(data["item"]["messages"][1]["text"] + f"\n\n当前{currentConversation} 共 {maxConversation}", at_sender=True)
+            await bingchat.send(swap_string_positions(data["item"]["messages"][1]["adaptiveCards"][0]["body"][0]["text"]) + f"\n\n当前{currentConversation} 共 {maxConversation}", at_sender=True)
         else:                                    # 超过最大上限, 发送并且重置会话
-            await bingchat.send(data["item"]["messages"][1]["text"]+ f"\n\n当前{currentConversation} 共 {maxConversation}", at_sender=True) 
+            await bingchat.send(swap_string_positions(data["item"]["messages"][1]["adaptiveCards"][0]["body"][0]["text"])+ f"\n\n当前{currentConversation} 共 {maxConversation}", at_sender=True) 
             _ = await new_chat_(event.get_user_id())
             await bingchat.send("达到对话上限, 已自动重置会话", at_sender=True)
     except Exception as e:      # 如果出现异常, 则直接发送报错信息, 防止bot无反应
