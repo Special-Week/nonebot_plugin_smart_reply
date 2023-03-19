@@ -31,16 +31,10 @@ async def bing_handle(matcher:Matcher,event:MessageEvent,args: Message = Command
     msg = args.extract_plain_text()         # 获取消息
     if bing_cookies == []:                       # 如果cookies为空, 则无法访问bing
         await matcher.finish("cookie未设置, 无法访问")
-    if (msg.isspace() or msg == "" or msg in [
-        "你好啊",
-        "你好",
-        "在吗",
-        "在不在",
-        "您好",
-        "您好啊",
-        "你好",
-        "在",
-    ]):                                     # 如果消息为空或者是一些无意义的问候, 则返回一些问候语
+    if msg.isspace() or msg == "" :
+        return
+    if (msg in ["你好啊", "你好", "在吗", "在不在", "您好", "您好啊", "你好", "在"]):  
+        # 如果消息为空或者是一些无意义的问候, 则返回一些问候语
         await matcher.finish(hello())
 
 
@@ -56,7 +50,7 @@ async def bing_handle(matcher:Matcher,event:MessageEvent,args: Message = Command
         data = await bot.ask(prompt=msg, conversation_style=style)
     except Exception as e:                # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
         bing_chat_dict[uid]["isRunning"] = False
-        await matcher.finish("askError: " + str(e) + "多次askError请尝试\"重置会话\"", at_sender=True)
+        await matcher.finish("askError: " + str(e) + "多次askError请尝试\"重置bing\"", at_sender=True)
     bing_chat_dict[uid]["isRunning"] = False     # 将当前会话状态设置为未运行
     if data["item"]["result"]["value"] != "Success":  # 如果返回的结果不是Success, 则返回错误信息, 并且删除当前会话
         await matcher.send("返回Error: " + data["item"]["result"]["value"] + "请重试", at_sender=True)

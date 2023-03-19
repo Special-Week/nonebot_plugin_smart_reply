@@ -27,16 +27,10 @@ async def openai_handle(matcher:Matcher,event:MessageEvent,args: Message = Comma
     msg = args.extract_plain_text()         # 获取消息
     if openai_api_key == []:
         await matcher.finish("openai_api_key未设置, 无法访问")
-    if (msg.isspace() or msg == "" or msg in [
-        "你好啊",
-        "你好",
-        "在吗",
-        "在不在",
-        "您好",
-        "您好啊",
-        "你好",
-        "在",
-    ]):                                     # 如果消息为空或者是一些无意义的问候, 则返回一些问候语
+    if msg.isspace() or msg == "" :
+        return
+    if (msg in ["你好啊", "你好", "在吗", "在不在", "您好", "您好啊", "你好", "在"]):  
+        # 如果消息为空或者是一些无意义的问候, 则返回一些问候语
         await matcher.finish(hello())
 
     if uid not in openai_chat_dict:                # 如果用户id不在会话字典中, 则新建一个会话
@@ -50,7 +44,8 @@ async def openai_handle(matcher:Matcher,event:MessageEvent,args: Message = Comma
         data = bot.ask(msg)
     except Exception as e:                # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
         openai_chat_dict[uid]["isRunning"] = False
-        await matcher.finish("askError: " + str(e) + "多次askError请尝试\"重置会话\"", at_sender=True)
+        await matcher.finish("askError: " + str(e) + "多次askError请尝试\"重置openai\"", at_sender=True)
+    openai_chat_dict[uid]["isRunning"] = False         # 将当前会话状态设置为未运行
     try:
         await matcher.send(data, at_sender=True)
     except Exception as e:
