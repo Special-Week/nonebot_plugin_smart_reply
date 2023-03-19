@@ -18,6 +18,7 @@ from nonebot.adapters.onebot.v11 import (
 from .utils import(
     del_,
     add_,
+    hello,
     check_,
     check_al,
     text_to_png,
@@ -25,7 +26,6 @@ from .utils import(
     
     poke__reply,
     Bot_NICKNAME,
-    hello__reply,
     aac_file_path,
     reply_private,
     aac_file_list,
@@ -138,7 +138,7 @@ async def regular_reply(matcher:Matcher, event: MessageEvent):
         "你好",
         "在",
     ]:
-        await matcher.finish(Message(random.choice(hello__reply)))
+        await matcher.finish(Message(random.choice(hello())))
     # 获取用户nickname
     if isinstance(event, GroupMessageEvent):
         nickname = event.sender.card or event.sender.nickname
