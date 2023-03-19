@@ -62,7 +62,7 @@
 
     用法:
         1. openai + 内容, 和openai发起会话, 如果没有会新建会话
-        2. 重置会话, 重置openai的会话
+        2. 重置openai, 重置openai的会话
 
     使用了与openai通讯的接口 [ChatGPT](https://github.com/acheong08/ChatGPT)        
 
@@ -78,11 +78,12 @@
     4. 新建cookiexxx.json文件(xxx为任意合法字符), 把你剪贴板的cookie的字符串粘贴进去, 再次强调json大概长[{},{},{}]这样
     5. 打开你bot项目文件夹, 依次进入data/smart_reply, 没有就新建, 把json文件丢进去, 有几个账号可以放几个, 要求cookie开头, .json结尾, 载入插件时初始化会全部读取, 创建会话的时候会通过random来选择一个账号的cookie
     6. 注意观察加载插件的时候, log会提示你加载了几个cookie
+    7. 尽量保证EdgeGPT模块是最新(pip install EdgeGPT --upgrade)
 
 
     用法:
         1. bing + 内容, 和bing发起会话, 如果没有会新建会话.
-        2. 重置会话, 重置bing的会话
+        2. 重置bing, 重置bing的会话
 
         
     使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
