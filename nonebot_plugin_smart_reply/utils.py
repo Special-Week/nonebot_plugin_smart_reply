@@ -23,6 +23,7 @@ openai_max_tokens: int = getattr(config, "openai_max_tokens", 1000)
 openai_cd_time: int = getattr(config, "openai_cd_time", 10*60)
 newbing_cd_time: int = getattr(config, "newbing_cd_time", 10*60)
 # ===================================================================================================
+logger.info(f"openai_api_key读取, 初始化成功, 共{len(openai_api_key)}个api_key")   # 打印日志
 
 
 
