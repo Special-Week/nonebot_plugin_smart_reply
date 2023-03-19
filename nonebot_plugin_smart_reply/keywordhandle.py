@@ -138,7 +138,7 @@ async def regular_reply(matcher:Matcher, event: MessageEvent):
         "你好",
         "在",
     ]:
-        await matcher.finish(Message(random.choice(hello())))
+        await matcher.finish(Message(hello()))
     # 获取用户nickname
     if isinstance(event, GroupMessageEvent):
         nickname = event.sender.card or event.sender.nickname
