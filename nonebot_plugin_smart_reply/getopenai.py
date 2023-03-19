@@ -1,3 +1,4 @@
+import asyncio
 from revChatGPT.V3 import Chatbot
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg
@@ -41,7 +42,8 @@ async def openai_handle(matcher:Matcher,event:MessageEvent,args: Message = Comma
     openai_chat_dict[uid]["isRunning"] = True          # 将当前会话状态设置为运行中
     bot: Chatbot = openai_chat_dict[uid]["Chatbot"]     # 获取当前会话的Chatbot对象
     try:
-        data = bot.ask(msg)
+        loop = asyncio.get_event_loop()  
+        data = await loop.run_in_executor(None, bot.ask, msg)
     except Exception as e:                # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
         openai_chat_dict[uid]["isRunning"] = False
         await matcher.finish("askError: " + str(e) + "多次askError请尝试\"重置openai\"", at_sender=True)
