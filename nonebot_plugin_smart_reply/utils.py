@@ -86,13 +86,12 @@ class Utils:
         self.openai_chat_dict: dict = {}   
         self.openai_api_key: list = config.openai_api_key
         self.openai_max_tokens: int = config.openai_max_tokens
-        self.proxy = config.bing_or_openai_proxy
-        if self.proxy:
-            logger.info(f"代理已加载, 地址为: {self.proxy}")
-        else:
-            self.proxy = None
-            logger.warning("代理未加载, 使用国内服务器可能无法访问openai以及bing")
 
+        if config.bing_or_openai_proxy:
+            os.system(f"set all_proxy={config.bing_or_openai_proxy}")
+            logger.info(f"已设置代理, 值为:{config.bing_or_openai_proxy}")
+        else:
+            logger.warning("未检测到代理，国内用户可能无法使用bing或openai功能")
 
 
     # ================================================================================================
@@ -108,7 +107,7 @@ class Utils:
                 await matcher.finish(
                     f"非报错情况下每个会话需要{config.newbing_cd_time}秒才能新建哦, 当前还需要{config.newbing_cd_time - (current_time - last_time)}秒"
                 )
-        bot = bingChatbot(cookies=random.choice(self.bing_cookies),proxy=self.proxy)  # 随机选择一个cookies创建一个Chatbot
+        bot = bingChatbot(cookies=random.choice(self.bing_cookies))  # 随机选择一个cookies创建一个Chatbot
         self.bing_chat_dict[user_id] = {"chatbot": bot, "last_time": current_time, "model": "balanced", "isRunning": False}
 
 
@@ -148,7 +147,6 @@ class Utils:
         bot = openaiChatbot(
             api_key=random.choice(self.openai_api_key),
             max_tokens=self.openai_max_tokens,
-            proxy=self.proxy,
         )  # 随机选择一个api_key创建一个Chatbot
         self.openai_chat_dict[user_id] = {"chatbot": bot, "last_time": current_time, "isRunning": False}
     # ================================================================================================

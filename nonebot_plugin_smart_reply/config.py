@@ -1,11 +1,9 @@
 from pathlib import Path
 from typing import Optional, Sequence
-
+import os
 from nonebot import get_driver
 from nonebot.log import logger
 from pydantic import BaseSettings, validator
-
-
 class Config(BaseSettings):
     bot_nickname: str = "我"
     smart_reply_path: Path = Path("data/smart_reply")
@@ -33,6 +31,7 @@ class Config(BaseSettings):
 
 
 config = Config.parse_obj(get_driver().config)
+
 
 if not config.smart_reply_path.exists() or not config.smart_reply_path.is_dir():
     config.smart_reply_path.mkdir(0o755, parents=True, exist_ok=True)
