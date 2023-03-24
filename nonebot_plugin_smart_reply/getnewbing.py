@@ -83,7 +83,7 @@ class NewBing:
         current_conversation = throttling["numUserMessagesInConversation"]
         if len(data["item"]["messages"]) < 2:  # 如果返回的消息数量小于2, 则说明会话已经中断, 则删除当前会话
             await matcher.send("该对话已中断, 可能是被bing掐了, 正帮你重新创建会话", at_sender=True)
-            await utils.newbing_new_chat(event=event, matcher=matcher, user_id=uid)
+            await utils.newbing_new_chat(event=event, matcher=matcher)
             return
         # 如果返回的消息中没有text, 则说明提问了敏感问题, 则删除当前会话
         if "text" not in data["item"]["messages"][1]:
