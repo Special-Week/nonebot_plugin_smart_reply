@@ -91,7 +91,7 @@ class KeyWordModule:
         matcher: Matcher, 
         event: PokeNotifyEvent
     ):
-        """戳一戳回复"""
+        """戳一戳回复, 私聊会报错, 暂时摸不着头脑"""
         if event.is_tome():
             probability = random.random()
             # 33%概率回复莲宝的藏话

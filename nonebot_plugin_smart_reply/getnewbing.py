@@ -9,6 +9,7 @@ from .utils import utils
 
 class NewBing:
     def __init__(self) -> None:
+        """初始化newbing, 标记cookie是否有效, 以及是否私聊启用"""
         self.cookie_allow = bool(utils.bing_cookies)
         self.reply_private: bool = utils.reply_private
 
@@ -28,12 +29,13 @@ class NewBing:
         matcher: Matcher, 
         msg: str
     ):  
+        """稍微预处理一下"""
         uid = event.get_user_id()  # 获取用户id
         if not self.reply_private and isinstance(event, PrivateMessageEvent):
             await matcher.finish()          # 配置私聊不启用后，私聊信息直接结束处理
-        if msg.isspace() or not msg:
+        if msg.isspace() or not msg:        # 如果消息为空或者全为空格, 则结束处理
             await matcher.finish()
-        if utils.bing_cookies == []:
+        if not self.cookie_allow:
             await matcher.finish("cookie未设置, 无法访问")
         if msg in utils.nonsense:
             await matcher.finish(await utils.rand_hello())
@@ -50,7 +52,7 @@ class NewBing:
         matcher: Matcher, 
         event: MessageEvent, 
         args: Message = CommandArg()
-    ):    # sourcery skip: hoist-statement-from-if, remove-pass-body
+    ): 
         """newbing聊天的handle函数"""
         uid = event.get_user_id()  # 获取用户id
         msg = args.extract_plain_text()  # 获取消息
@@ -111,7 +113,7 @@ class NewBing:
                     at_sender=True,
                 )
             except Exception as eeee:  # 如果还是失败, 我也没辙了, 只能返回异常信息了
-                await matcher.send(f"消息全被风控了, 这是捕获的异常: {str(eeee)}", at_sender=True)
+                await matcher.send(f"消息全被风控了, 这是捕获的异常: \n{str(eeee)}", at_sender=True)
 
 
 # 实例化一个NewBing对象

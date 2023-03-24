@@ -55,7 +55,7 @@ class Openai:
         utils.openai_chat_dict[uid]["isRunning"] = True  # 将当前会话状态设置为运行中
         bot: Chatbot = utils.openai_chat_dict[uid]["chatbot"]  # 获取当前会话的Chatbot对象
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_event_loop()     # 调用ask会阻塞asyncio
             data = await loop.run_in_executor(None, bot.ask, msg)
         except Exception as e:  # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
             utils.openai_chat_dict[uid]["isRunning"] = False
@@ -72,7 +72,7 @@ class Openai:
                     at_sender=True,
                 )
             except Exception as eeee:
-                await matcher.send(f"消息全被风控了, 这是捕获的异常: {str(eeee)}", at_sender=True)
+                await matcher.send(f"消息全被风控了, 这是捕获的异常: \n{str(eeee)}", at_sender=True)
 
 
 # 创建实例
