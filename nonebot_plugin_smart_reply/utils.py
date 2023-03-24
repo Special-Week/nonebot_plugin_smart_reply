@@ -88,7 +88,7 @@ class Utils:
         self.openai_max_tokens: int = config.openai_max_tokens
 
         if config.bing_or_openai_proxy:
-            os.system(f"set all_proxy={config.bing_or_openai_proxy}")
+            os.environ["all_proxy"] = config.bing_or_openai_proxy
             logger.info(f"已设置代理, 值为:{config.bing_or_openai_proxy}")
         else:
             logger.warning("未检测到代理，国内用户可能无法使用bing或openai功能")
