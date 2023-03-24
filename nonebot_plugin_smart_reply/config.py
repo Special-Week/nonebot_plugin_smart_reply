@@ -1,9 +1,11 @@
 from pathlib import Path
 from typing import Optional, Sequence
-import os
+
 from nonebot import get_driver
 from nonebot.log import logger
 from pydantic import BaseSettings, validator
+
+
 class Config(BaseSettings):
     bot_nickname: str = "我"
     smart_reply_path: Path = Path("data/smart_reply")
