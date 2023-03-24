@@ -86,8 +86,6 @@
         1. bing + 内容, 和bing发起会话, 如果没有会新建会话.
         2. 重置bing, 重置bing的会话
 
-
-​        
     使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
 
 
