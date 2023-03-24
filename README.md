@@ -31,12 +31,13 @@
 
 |config          |type            |default    |example                                  |usage                                   |
 |----------------|----------------|-----------|-----------------------------------------|----------------------------------------|
-| bot_nickname   | string         |脑积水     |Bot_NICKNAME = "Hinata"                  |      你Bot的称呼                         |
+| bot_nickname   | string         |我     |Bot_NICKNAME = "Hinata"                  |      你Bot的称呼                         |
 | ai_reply_private  | boolean |false     |ai_reply_private = true          |    私聊时是否启用AI聊天            |
 | openai_api_key    | list  |寄        |openai_api_key = ["aabb114514"]    |    openai的api_key, 详细请看下文         |
 | openai_max_tokens | int     |1000      |openai_max_tokens = 1500         |    openai的max_tokens, 详细请看下文     |
 | openai_cd_time    | int     |600        |openai_cd_time = 114             |    openai创建会话的cd                       |
 | newbing_cd_time    | int     |600        |newbing_cd_time = 114             |    newbing创建会话的cd                       |
+|bing_or_openai_proxy|str       |""         |bing_or_openai_proxy = "http://127.0.0.1:1081" |    openai或者newbing的代理, 配置详细请看下文|        
 
 .env完全不配置不影响插件运行, 但是部分功能会无法使用(openai, newbing)
 
@@ -54,7 +55,7 @@
     1. openai_api_key请注册openai后在 https://beta.openai.com/account/api-keys 自己获取
     2. openai_max_tokens貌似是ai返回的文本最大多少(根据我自己用的经验)
     3. openai_api_key必须配置, openai_max_tokens随意, 有默认值(1000)
-    4. 需要科学上网, 否则异常
+    4. 需要配置代理, 否则无法使用, 代理配置详细请看下文
     5. 这个模块貌似不是免费的, 注册的账号只有$18.00的免费额度(现在缩成了5刀??), 请注意使用
     6. openai_api_key要求你填的是list, 创建会话的时候会随机从list选一个, 你可以填多个, 注意观察加载插件的时候, log会提示你加载了几个apikey
     7. 尽量保证revChatGPT模块是最新(pip install revChatGPT --upgrade)
@@ -63,7 +64,7 @@
     用法:
         1. openai + 内容, 和openai发起会话, 如果没有会新建会话
         2. 重置openai, 重置openai的会话
-
+    
     使用了与openai通讯的接口 [ChatGPT](https://github.com/acheong08/ChatGPT)        
 
 
@@ -71,7 +72,7 @@
 
 ## 关于new bing的配置:
 
-    0. 也许需要科学上网
+    0. 也许需要科学上网, 代理配置详细请看下文
     1. 使用功能必须配置cookie, 否则无法使用, 这个cookie内容过多不适合在.env, 所以这个cookie将会与json文件的形式进行配置
     2. 首先你需要一个通过申请的账号, 使用edge浏览器安装"editthiscookie"浏览器插件, 或者使用相关的其他插件获取cookie. 进入"bing.com/chat"登录通过的账号
     3. 右键界面选择"editthiscookie", 找到一个看上去像出门的样子的图标"导出cookie", cookie一般就能在你的剪贴板, 注意了, cookie导出来是一个list, 大概长这样[{},{},{}]
@@ -85,39 +86,43 @@
         1. bing + 内容, 和bing发起会话, 如果没有会新建会话.
         2. 重置bing, 重置bing的会话
 
-        
+
+​        
     使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
 
 
 
 
-## 会有人需要教命令行如何科学上网吗?:
+## bing_or_openai_proxy的配置:
 
-    1. 利用v2rayN等工具开启本地监听端口(一般高位端口任意设置, 下面用port代替你说设置的)
-    2. 环境变量增加all_proxy变量, 协议是socks那值就是socks5://127.0.0.1:port, 是http那么值就是http://127.0.0.1:port
+    1. 你需要使用v2ray或者clash等代理工具开启本地监听端口
+    2. 根据http和socks5的不同, 配置不同, 
+    3. 以v2rayN举例, 本地监听端口1080, 你应该配置成"socks5://127.0.0.1:1080"或者"http://127.0.0.1:1081"
+
+
 
 
 
 响应器:
 ```python
 # 戳一戳响应器 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
-poke_ = on_notice(rule=to_me(), block=False, handlers=[poke])
+poke_ = on_notice(rule=to_me(), block=False, handlers=[key_word_module.poke_handle])
 # 添加关键词响应器, 优先级11, 条件: 正则表达式
-add_new = on_regex(r"^添加关键词\s*(\S+.*?)\s*答\s*(\S+.*?)\s*$", flags=re.S, priority=11, permission=SUPERUSER, handlers=[add_new_keyword])
+add_new = on_regex(r"^添加关键词\s*(\S+.*?)\s*答\s*(\S+.*?)\s*$", flags=re.S, block=True, priority=11, permission=SUPERUSER, handlers=[key_word_module.add_new_keyword])
 # 查看所有关键词响应器, 优先级11, 条件: 命令头
-check_all = on_command("查看所有关键词", aliases={"查询所有关键词"}, priority=11, permission=SUPERUSER, handlers=[check_all_keyword])
+check_all = on_command("查看所有关键词", aliases={"查询所有关键词"}, block=True, priority=11, permission=SUPERUSER, handlers=[key_word_module.check_all_keyword])
 # 删除关键词响应器, 优先级11, 条件: 命令头
-del_keyword = on_command("删除关键词", priority=11, permission=SUPERUSER, handlers=[del_keyword_handle])
+del_akeyword = on_regex(r"^删除关键词\s*(\S+.*?)\s*删\s*(\S+.*?)\s*$", flags=re.S, priority=10, permission=SUPERUSER, handlers=[key_word_module.del_akeyword_handle])
 # 删除关键词的一个回复响应器, 优先级10, 条件: 正则表达式
-del_akeyword = on_regex(r"^删除关键词\s*(\S+.*?)\s*删\s*(\S+.*?)\s*$", flags=re.S, priority=10, permission=SUPERUSER, handlers=[del_akeyword_handle])
+del_akeyword = on_regex(r"^删除关键词\s*(\S+.*?)\s*删\s*(\S+.*?)\s*$", flags=re.S, priority=10, permission=SUPERUSER, handlers=[key_word_module.del_akeyword_handle])
 # 普通回复响应器, 优先级999, 条件: 艾特bot就触发
-regular = on_message(rule=to_me(), priority=999, block=False, handlers=[regular_reply])
+regular = on_message(rule=to_me(), priority=999, block=False, handlers=[key_word_module.regular_reply])
 # 查看关键词响应器
-check_new = on_command("查看关键词", aliases={"查询关键词"}, priority=11, permission=SUPERUSER, handlers=[check_keyword_handle])
+check_new = on_command("查看关键词", aliases={"查询关键词"}, priority=11, block=True, permission=SUPERUSER, handlers=[key_word_module.check_keyword_handle])
 # 使用bing的响应器
-bingchat = on_command("bing", priority=55, block=True, handlers=[bing_handle])
-reserveBing = on_command("重置bing",aliases={"重置会话","bing重置", "会话重置"}, priority=10, block=True, handlers=[reserve_Bing])
+bingchat = on_command("bing", priority=55, block=True, handlers=[newbing.bing_handle])
+reserveBing = on_command("重置bing", aliases={"重置会话", "bing重置", "会话重置"}, priority=10, block=True, handlers=[newbing.reserve_bing])
 # 使用openai的响应器
-openai_text = on_command("openai",aliases={"求助"},block=True, priority=55, handlers=[openai_handle])
-reserveOp = on_command("重置openai",aliases={"重置会话","openai重置", "会话重置"}, priority=10, block=True, handlers=[reserve_OP])
+openai_text = on_command("openai",aliases={"求助"},block=True, priority=55, handlers=[openai.openai_handle])
+reserveOp = on_command("重置openai", aliases={"重置会话", "openai重置", "会话重置"}, priority=10, block=True, handlers=[openai.reserve_openai])
 ```
