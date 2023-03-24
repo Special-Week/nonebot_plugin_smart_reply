@@ -132,7 +132,7 @@ class KeyWordModule:
             or msg.isspace()
             or msg in utils.nonsense
         ):
-            await matcher.finish(Message(await utils.rand_poke()))
+            await matcher.finish(Message(await utils.rand_hello()))
         # 获取用户nickname
         if isinstance(event, GroupMessageEvent):
             nickname = event.sender.card or event.sender.nickname
