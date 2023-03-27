@@ -82,7 +82,7 @@ class Utils:
             logger.error(f"读取bing cookies失败 error信息: {str(e)}")
             self.bing_cookies: list = []
         # ==================================== openai工具属性 ====================================================
-        # 会话字典，用于存储会话   {"user_id": {"chatbot": bot, "last_time": time}}
+        # 会话字典，用于存储会话   {"user_id": {"chatbot": bot, "last_time": time, "sessions_number": 0}}
         self.openai_chat_dict: dict = {}   
         self.openai_api_key: list = config.openai_api_key
         self.openai_max_tokens: int = config.openai_max_tokens
@@ -148,7 +148,7 @@ class Utils:
             api_key=random.choice(self.openai_api_key),
             max_tokens=self.openai_max_tokens,
         )  # 随机选择一个api_key创建一个Chatbot
-        self.openai_chat_dict[user_id] = {"chatbot": bot, "last_time": current_time, "isRunning": False}
+        self.openai_chat_dict[user_id] = {"chatbot": bot, "last_time": current_time, "sessions_number":0, "isRunning": False}
     # ================================================================================================
 
 

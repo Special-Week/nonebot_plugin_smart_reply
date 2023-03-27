@@ -57,12 +57,15 @@ class Openai:
         try:
             loop = asyncio.get_event_loop()     # 调用ask会阻塞asyncio
             data = await loop.run_in_executor(None, bot.ask, msg)
+            utils.openai_chat_dict[uid]["sessions_number"]+=1  # 会话数+1
         except Exception as e:  # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
             utils.openai_chat_dict[uid]["isRunning"] = False
             await matcher.finish(
                 f'askError: {str(e)}多次askError请尝试发送"重置openai"', at_sender=True
             )
         utils.openai_chat_dict[uid]["isRunning"] = False  # 将当前会话状态设置为未运行
+        sessions_number = utils.openai_chat_dict[uid]["sessions_number"]  # 获取当前会话的会话数
+        data += f"\n\n当前会话: {sessions_number}   字数异常请发送\"重置openai\"" 
         try:
             await matcher.send(data, at_sender=True)
         except Exception as e:
