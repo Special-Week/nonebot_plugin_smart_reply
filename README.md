@@ -39,6 +39,7 @@
 | newbing_cd_time    | int     |600        |newbing_cd_time = 114             |    newbing创建会话的cd                       |
 |bing_or_openai_proxy|str       |""         |bing_or_openai_proxy = "http://127.0.0.1:1081" |    openai或者newbing的代理, 配置详细请看下文|        
 |newbing_style    |str             |creative   |newbing_style = "creative"             |newbing的风格, "creative", "balanced", "precise", 三选一, 乱填报错我不管|
+
 .env完全不配置不影响插件运行, 但是部分功能会无法使用(openai, newbing)
 
 
