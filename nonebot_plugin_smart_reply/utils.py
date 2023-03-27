@@ -108,7 +108,7 @@ class Utils:
                     f"非报错情况下每个会话需要{config.newbing_cd_time}秒才能新建哦, 当前还需要{config.newbing_cd_time - (current_time - last_time)}秒"
                 )
         bot = bingChatbot(cookies=random.choice(self.bing_cookies))  # 随机选择一个cookies创建一个Chatbot
-        self.bing_chat_dict[user_id] = {"chatbot": bot, "last_time": current_time, "model": "balanced", "isRunning": False}
+        self.bing_chat_dict[user_id] = {"chatbot": bot, "last_time": current_time, "model": config.newbing_style, "isRunning": False}
 
 
     async def bing_string_handle(self, input_string: str) -> str:
