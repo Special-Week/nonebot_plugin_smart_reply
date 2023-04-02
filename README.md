@@ -1,6 +1,8 @@
 # nonebot2智能(障)回复插件
 
     问问提前请务必看完readme, 这是一个融合了openai, newbing, 词库的智障回复插件
+    
+### 提醒, new bing与openai国内服务器需要科学上网才可调用
 
 
 ## 功能
@@ -80,7 +82,7 @@
     4. 新建cookiexxx.json文件(xxx为任意合法字符), 把你剪贴板的cookie的字符串粘贴进去, 再次强调json大概长[{},{},{}]这样
     5. 打开你bot项目文件夹, 依次进入data/smart_reply, 没有就新建, 把json文件丢进去, 有几个账号可以放几个, 要求cookie开头, .json结尾, 载入插件时初始化会全部读取, 创建会话的时候会通过random来选择一个账号的cookie
     6. 注意观察加载插件的时候, log会提示你加载了几个cookie
-    7. 尽量保证EdgeGPT模块是最新(pip install EdgeGPT --upgrade)
+    7. 尽量保证EdgeGPT模块是最新(pip install EdgeGPT --upgrade), 调用时报错请检查EdgeGPT是否最新, cookie是否有效, 是否做到了科学上网
 
 
     用法:
