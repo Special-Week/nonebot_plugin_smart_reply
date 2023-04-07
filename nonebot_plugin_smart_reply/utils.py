@@ -86,6 +86,7 @@ class Utils:
         self.openai_chat_dict: dict = {}   
         self.openai_api_key: list = config.openai_api_key
         self.openai_max_tokens: int = config.openai_max_tokens
+        self.max_sessions_number: int = config.openai_max_conversation
 
         if config.bing_or_openai_proxy:
             os.environ["all_proxy"] = config.bing_or_openai_proxy
