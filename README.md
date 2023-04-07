@@ -39,6 +39,7 @@
 | openai_max_tokens | int     |1000      |openai_max_tokens = 1500         |    openai的max_tokens, 详细请看下文     |
 | openai_cd_time    | int     |600        |openai_cd_time = 114             |    openai创建会话的cd                       |
 | newbing_cd_time    | int     |600        |newbing_cd_time = 114             |    newbing创建会话的cd                       |
+| openai_max_conversation|int|10|openai_max_conversation = 10|openai的当个会话点最大交互数量|
 |bing_or_openai_proxy|str       |""         |bing_or_openai_proxy = "http://127.0.0.1:1081" |    openai或者newbing的代理, 配置详细请看下文|        
 |newbing_style    |str             |creative   |newbing_style = "creative"             |newbing的风格, "creative", "balanced", "precise", 三选一, 乱填报错我不管|
 
