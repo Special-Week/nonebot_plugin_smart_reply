@@ -139,7 +139,7 @@ class KeyWordModule:
         else:
             nickname = event.sender.nickname
         # 从字典里获取结果
-        result = await utils.get_chat_result(msg, nickname)
+        result = await utils.get_chat_result(msg, nickname) # type: ignore
         # 如果词库没有结果，则调用api获取智能回复
         if result is None:
             await matcher.finish(

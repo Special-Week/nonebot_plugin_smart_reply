@@ -3,6 +3,7 @@ import os
 import random
 import re
 from pathlib import Path
+from typing import Union
 
 from EdgeGPT import Chatbot as bingChatbot
 from loguru import logger
@@ -84,7 +85,7 @@ class Utils:
         # ==================================== openai工具属性 ====================================================
         # 会话字典，用于存储会话   {"user_id": {"chatbot": bot, "last_time": time, "sessions_number": 0}}
         self.openai_chat_dict: dict = {}   
-        self.openai_api_key: list = config.openai_api_key
+        self.openai_api_key: list = config.openai_api_key # type: ignore
         self.openai_max_tokens: int = config.openai_max_tokens
         self.max_sessions_number: int = config.openai_max_conversation
 
@@ -104,7 +105,7 @@ class Utils:
             last_time: int = self.bing_chat_dict[user_id]["last_time"]
             if (current_time - last_time < config.newbing_cd_time) and (
                 event.get_user_id() not in config.superusers
-            ):  # 如果当前时间减去上一次时间小于CD时间, 直接返回
+            ):  # 如果当前时间减去上一次时间小于CD时间, 直接返回 # type: ignore
                 await matcher.finish(
                     f"非报错情况下每个会话需要{config.newbing_cd_time}秒才能新建哦, 当前还需要{config.newbing_cd_time - (current_time - last_time)}秒"
                 )
@@ -141,7 +142,7 @@ class Utils:
             last_time = self.openai_chat_dict[user_id]["last_time"]
             if (current_time - last_time < config.openai_cd_time) and (
                 event.get_user_id() not in config.superusers
-            ):  # 如果当前时间减去上一次时间小于CD时间, 直接返回
+            ):  # 如果当前时间减去上一次时间小于CD时间, 直接返回 # type: ignore
                 await matcher.finish(
                     f"非报错情况下每个会话需要{config.openai_cd_time}秒才能新建哦, 当前还需要{config.openai_cd_time - (current_time - last_time)}秒"
                 )
@@ -165,7 +166,7 @@ class Utils:
         return random.choice(self.poke__reply)
 
 
-    async def get_chat_result(self, text: str, nickname: str) -> str:
+    async def get_chat_result(self, text: str, nickname: str) -> Union[str, None]:
         """从字典中返回结果"""
         if len(text) < 7:
             keys = self.anime_thesaurus.keys()
@@ -174,7 +175,7 @@ class Utils:
                     return random.choice(self.anime_thesaurus[key]).replace("你", nickname)
                 
 
-    async def add_word(self, word1: str, word2: str) -> str:
+    async def add_word(self, word1: str, word2: str) -> Union[str, None]:
         """添加词条"""
         lis = []
         for key in self.anime_thesaurus:

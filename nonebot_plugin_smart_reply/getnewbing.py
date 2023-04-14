@@ -62,7 +62,7 @@ class NewBing:
         bot: Chatbot = utils.bing_chat_dict[uid]["chatbot"]  # 获取当前会话的Chatbot对象
         style: str = utils.bing_chat_dict[uid]["model"]  # 获取当前会话的对话样式
         try:  # 尝试获取bing的回复
-            data = await bot.ask(prompt=msg, conversation_style=style)
+            data = await bot.ask(prompt=msg, conversation_style=style) # type: ignore
         except Exception as e:  # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
             utils.bing_chat_dict[uid]["isRunning"] = False
             await matcher.finish(f'askError: {str(e)}多次askError请尝试"重置bing"', at_sender=True)
