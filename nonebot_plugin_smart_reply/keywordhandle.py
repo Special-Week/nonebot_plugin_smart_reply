@@ -95,7 +95,7 @@ class KeyWordModule:
         if event.is_tome():
             probability = random.random()
             # 33%概率回复莲宝的藏话
-            if probability > 11:
+            if probability < 0.33:
                 # 发送语音需要配置ffmpeg, 这里try一下, 不行就随机回复poke__reply的内容
                 try:
                     await matcher.send(
