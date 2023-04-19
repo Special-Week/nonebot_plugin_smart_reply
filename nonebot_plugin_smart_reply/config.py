@@ -18,6 +18,8 @@ class Config(BaseSettings):
     newbing_style: str = "creative"
     bing_or_openai_proxy: str = ""
     superusers: Optional[Sequence[str]] = []
+    tts:bool = False
+    tts_model = Optional[str] = "宁宁"
 
     @validator("openai_api_key")
     def _check_openai_api_key(cls, v):
