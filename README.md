@@ -10,6 +10,7 @@
     艾特bot时回复一些基于词库的消息, 戳一戳回复特定的消息或者语音以及反戳
     接入了new bing的接口, 详情见下文
     接入了openai的接口, 详情见下文
+    使用[tts](https://github.com/dpm12345/nonebot_plugin_tts_gal)语音合成, 详情见下文
 
 ## 词库添加关键词:
 	1、添加关键词 [text1] 答 [text2]		 
@@ -42,8 +43,10 @@
 | newbing_cd_time    | int     |600        |newbing_cd_time = 114             |    newbing创建会话的cd                       |
 |bing_or_openai_proxy|str       |""         |bing_or_openai_proxy = "http://127.0.0.1:1081" |    openai或者newbing的代理, 配置详细请看下文|        
 |newbing_style    |str             |creative   |newbing_style = "creative"             |newbing的风格, "creative", "balanced", "precise", 三选一, 乱填报错我不管|
+| tts   | boolean         |False     |tts = True                 |      是否启用tts语音合成                         |
+| tts_model   | string         |"宁宁"     |tts_model = "Hinata"                  |      tts合成中的模型，详见[这里](https://github.com/dpm12345/nonebot_plugin_tts_gal#%EF%B8%8F-%E9%85%8D%E7%BD%AE)                         |
 
-.env完全不配置不影响插件运行, 但是部分功能会无法使用(openai, newbing)
+.env完全不配置不影响插件运行, 但是部分功能会无法使用(openai, newbing, tts)
 
 
 
@@ -103,7 +106,11 @@
     4. 以clash for windows举例, 本地监听端口7890, 你应该配置成"socks5://127.0.0.1:7890"或者"http://127.0.0.1:7890"
 
 
+## 关于tts语音合成功能:
 
+    1. 请按照[原插件](https://github.com/dpm12345/nonebot_plugin_tts_gal)的说明写配置
+    2. tts设置为True , tts_model设置为已加载的本地模型角色名
+    3. 启用这部分功能比较麻烦，如果遇到报错去这个插件看readme
 
 
 响应器:

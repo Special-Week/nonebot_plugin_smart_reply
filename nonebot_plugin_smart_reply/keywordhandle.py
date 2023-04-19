@@ -11,6 +11,7 @@ from nonebot.matcher import Matcher
 from nonebot.params import CommandArg, RegexGroup
 
 from .utils import utils
+from .config import config
 
 
 class KeyWordModule:
@@ -145,6 +146,9 @@ class KeyWordModule:
             await matcher.finish(
                 Message(f"抱歉，{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用openai或者bing吧~")
             )
+        if config.tts:
+            from nonebot_plugin_tts_gal import voicHandler
+            await voicHandler(None, event, config.tts_model, result)
         await matcher.finish(Message(result))
 
 
