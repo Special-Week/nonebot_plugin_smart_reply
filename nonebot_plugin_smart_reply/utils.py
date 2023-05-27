@@ -7,7 +7,7 @@ from typing import Union
 
 from EdgeGPT import Chatbot as bingChatbot
 from loguru import logger
-from nonebot.adapters.onebot.v11 import MessageEvent
+from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment
 from nonebot.matcher import Matcher
 from revChatGPT.V3 import Chatbot as openaiChatbot
 
@@ -107,7 +107,8 @@ class Utils:
                 event.get_user_id() not in config.superusers
             ):  # 如果当前时间减去上一次时间小于CD时间, 直接返回 # type: ignore
                 await matcher.finish(
-                    f"非报错情况下每个会话需要{config.newbing_cd_time}秒才能新建哦, 当前还需要{config.newbing_cd_time - (current_time - last_time)}秒"
+                    MessageSegment.reply(event.message_id) +
+                    MessageSegment.text(f"非报错情况下每个会话需要{config.newbing_cd_time}秒才能新建哦, 当前还需要{config.newbing_cd_time - (current_time - last_time)}秒")
                 )
         bot = bingChatbot(cookies=random.choice(self.bing_cookies))  # 随机选择一个cookies创建一个Chatbot
         self.bing_chat_dict[user_id] = {"chatbot": bot, "last_time": current_time, "model": config.newbing_style, "isRunning": False}
@@ -144,7 +145,8 @@ class Utils:
                 event.get_user_id() not in config.superusers
             ):  # 如果当前时间减去上一次时间小于CD时间, 直接返回 # type: ignore
                 await matcher.finish(
-                    f"非报错情况下每个会话需要{config.openai_cd_time}秒才能新建哦, 当前还需要{config.openai_cd_time - (current_time - last_time)}秒"
+                    MessageSegment.reply(event.message_id) +
+                    MessageSegment.text(f"非报错情况下每个会话需要{config.openai_cd_time}秒才能新建哦, 当前还需要{config.openai_cd_time - (current_time - last_time)}秒")
                 )
         bot = openaiChatbot(
             api_key=random.choice(self.openai_api_key),

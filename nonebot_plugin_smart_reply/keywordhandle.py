@@ -132,7 +132,10 @@ class KeyWordModule:
             or msg.isspace()
             or msg in utils.nonsense
         ):
-            await matcher.finish(Message(await utils.rand_hello()))
+            await matcher.finish(
+                MessageSegment.reply(event.message_id) +
+                MessageSegment.text(await utils.rand_hello())
+            )
         # 获取用户nickname
         if isinstance(event, GroupMessageEvent):
             nickname = event.sender.card or event.sender.nickname
@@ -143,9 +146,13 @@ class KeyWordModule:
         # 如果词库没有结果，则调用api获取智能回复
         if result is None:
             await matcher.finish(
-                Message(f"抱歉，{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用openai或者bing吧~")
+                MessageSegment.reply(event.message_id) +
+                MessageSegment.text(f'抱歉，{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"openai"/"bing"命令头调用openai或new bing吧')
             )
-        await matcher.finish(Message(result))
+        await matcher.finish(
+            MessageSegment.reply(event.message_id) +
+            MessageSegment.text(result)
+        )
 
 
 # 创建实例

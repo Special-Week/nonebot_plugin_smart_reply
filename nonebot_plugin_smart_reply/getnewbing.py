@@ -37,13 +37,14 @@ class NewBing:
             await matcher.finish()
         if not self.cookie_allow:
             await matcher.finish("cookie未设置, 无法访问")
+        reply_msg = MessageSegment.reply(event.message_id)      # 回复消息的MessageSegment
         if msg in utils.nonsense:
-            await matcher.finish(await utils.rand_hello())
+            await matcher.finish(reply_msg + MessageSegment.text(await utils.rand_hello()))
         if uid not in utils.bing_chat_dict:
             await utils.newbing_new_chat(event=event, matcher=matcher)
-            await matcher.send("newbing新会话已创建", at_sender=True)
+            await matcher.send(reply_msg + MessageSegment.text("newbing新会话已创建"))
         if utils.bing_chat_dict[uid]["isRunning"]:
-            await matcher.finish("当前会话正在运行中, 请稍后再发起请求", at_sender=True)
+            await matcher.finish(reply_msg + MessageSegment.text("当前会话正在运行中, 请稍后再发起请求"))
         utils.bing_chat_dict[uid]["isRunning"] = True
 
         
@@ -61,17 +62,22 @@ class NewBing:
 
         bot: Chatbot = utils.bing_chat_dict[uid]["chatbot"]  # 获取当前会话的Chatbot对象
         style: str = utils.bing_chat_dict[uid]["model"]  # 获取当前会话的对话样式
+        reply_msg = MessageSegment.reply(event.message_id)      # 回复消息的MessageSegment
         try:  # 尝试获取bing的回复
             data = await bot.ask(prompt=msg, conversation_style=style) # type: ignore
         except Exception as e:  # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
             utils.bing_chat_dict[uid]["isRunning"] = False
-            await matcher.finish(f'askError: {str(e)}多次askError请尝试"重置bing"', at_sender=True)
+            await matcher.finish(
+                reply_msg + 
+                MessageSegment.text(f'askError: {str(e)}多次askError请尝试"重置bing"')
+            )
         utils.bing_chat_dict[uid]["isRunning"] = False  # 将当前会话状态设置为未运行
         if (
             data["item"]["result"]["value"] != "Success"
         ):  # 如果返回的结果不是Success, 则返回错误信息, 并且删除当前会话
             await matcher.send(
-                "返回Error: " + data["item"]["result"]["value"] + "请重试", at_sender=True
+                reply_msg +
+                MessageSegment.text("返回Error: " + data["item"]["result"]["value"] + "请重试")
             )
             del utils.bing_chat_dict[uid]
             return
@@ -82,14 +88,17 @@ class NewBing:
         # 获取当前会话的当前对话数
         current_conversation = throttling["numUserMessagesInConversation"]
         if len(data["item"]["messages"]) < 2:  # 如果返回的消息数量小于2, 则说明会话已经中断, 则删除当前会话
-            await matcher.send("该对话已中断, 可能是被bing掐了, 正帮你重新创建会话", at_sender=True)
+            await matcher.send(
+                reply_msg + 
+                MessageSegment.text("该对话已中断, 可能是被bing掐了, 正帮你重新创建会话")
+            )
             await utils.newbing_new_chat(event=event, matcher=matcher)
             return
         # 如果返回的消息中没有text, 则说明提问了敏感问题, 则删除当前会话
         if "text" not in data["item"]["messages"][1]:
             await matcher.send(
-                data["item"]["messages"][1]["adaptiveCards"][0]["body"][0]["text"],
-                at_sender=True,
+                reply_msg +
+                MessageSegment.text(data["item"]["messages"][1]["adaptiveCards"][0]["body"][0]["text"])
             )
             return
         rep_message = await utils.bing_string_handle(
@@ -97,11 +106,14 @@ class NewBing:
         )  # 获取bing的回复, 并且稍微处理一下
         try:  # 尝试发送回复
             await matcher.send(
-                f"{rep_message}\n\n当前{current_conversation} 共 {max_conversation}",
-                at_sender=True,
+                reply_msg +
+                MessageSegment.text(f"{rep_message}\n\n当前{current_conversation} 共 {max_conversation}")
             )
             if max_conversation <= current_conversation:
-                await matcher.send("达到对话上限, 正帮你重置会话", at_sender=True)
+                await matcher.send(
+                    reply_msg +
+                    MessageSegment.text("达到对话上限, 正帮你重置会话")
+                )
                 try:
                     await utils.newbing_new_chat(event=event, matcher=matcher)
                 except Exception:
@@ -109,11 +121,15 @@ class NewBing:
         except Exception as e:  # 如果发送失败, 则尝试把文字写在图片上发送
             try:
                 await matcher.send(
-                    f"文本消息可能被风控了\n错误信息:{str(e)}\n这里咱尝试把文字写在图片上发送了{MessageSegment.image(await utils.text_to_img(rep_message))}",
-                    at_sender=True,
+                    reply_msg +
+                    MessageSegment.text(f"文本消息可能被风控了\n错误信息:{str(e)}\n这里咱尝试把文字写在图片上发送了") +
+                    MessageSegment.image(await utils.text_to_img(rep_message))
                 )
             except Exception as eeee:  # 如果还是失败, 我也没辙了, 只能返回异常信息了
-                await matcher.send(f"消息全被风控了, 这是捕获的异常: \n{str(eeee)}", at_sender=True)
+                await matcher.send(
+                    reply_msg +
+                    MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{str(eeee)}")
+                )
 
 
 # 实例化一个NewBing对象
