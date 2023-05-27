@@ -133,7 +133,6 @@ class KeyWordModule:
             or msg in utils.nonsense
         ):
             await matcher.finish(
-                MessageSegment.reply(event.message_id) +
                 MessageSegment.text(await utils.rand_hello())
             )
         # 获取用户nickname
