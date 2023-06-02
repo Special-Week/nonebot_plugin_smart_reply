@@ -1,12 +1,41 @@
 import re
 
 from nonebot.permission import SUPERUSER
+from nonebot.plugin import PluginMetadata
 from nonebot.plugin.on import on_command, on_message, on_notice, on_regex
 from nonebot.rule import to_me
 
 from .getnewbing import newbing
 from .getopenai import openai
 from .keywordhandle import key_word_module
+
+
+__plugin_meta__ = PluginMetadata(
+    name="smart_reply",
+    description="nonebot2的融合了openai, newbing, 词库的智障回复插件",
+    usage="""
+openai [文本]  # 使用openai的api进行交互
+bing [文本]  # 使用new bing的api进行交互
+@bot [文本]  # 使用词库进行交互
+添加关键词 [关键词] 答 [回复]  # 添加自带词库的关键词
+删除关键词 [关键词]  # 删除自带词库的关键词
+删除关键词 [关键词] 删 [回复]  # 删除自带词库的关键词的一个回复
+查看所有关键词  # 查看自带词库的所有关键词
+查看关键词 [关键词]  # 查看自带词库的关键词的所有回复
+重置bing  # 重置bing的会话
+重置openai  # 重置openai的会话
+重置会话  # 重置bing和openai的会话
+群内戳一戳bot  # 戳一戳bot触发
+""",
+    extra={
+        'author':   'Special-Week',
+        'link':     'https://github.com/Special-Week/nonebot_plugin_smart_reply',
+        'version':  '0.0.34',
+        'priority': [1, 10, 11, 55, 999],
+    }
+)
+
+
 
 # 戳一戳响应器 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
 on_notice(rule=to_me(), block=False, handlers=[key_word_module.poke_handle])
