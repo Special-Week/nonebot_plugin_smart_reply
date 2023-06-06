@@ -27,6 +27,9 @@ bing [文本]  # 使用new bing的api进行交互
 重置会话  # 重置bing和openai的会话
 群内戳一戳bot  # 戳一戳bot触发
 """,
+    type="application",
+    homepage="https://github.com/Special-Week/nonebot_plugin_smart_reply",
+    supported_adapters={"~onebot.v11"},
     extra={
         'author':   'Special-Week',
         'link':     'https://github.com/Special-Week/nonebot_plugin_smart_reply',
