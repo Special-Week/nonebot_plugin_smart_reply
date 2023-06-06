@@ -83,16 +83,14 @@
     4. 新建cookiexxx.json文件(xxx为任意合法字符), 把你剪贴板的cookie的字符串粘贴进去, 再次强调json大概长[{},{},{}]这样
     5. 打开你bot项目文件夹, 依次进入data/smart_reply, 没有就新建, 把json文件丢进去, 有几个账号可以放几个, 要求cookie开头, .json结尾, 载入插件时初始化会全部读取, 创建会话的时候会通过random来选择一个账号的cookie
     6. 注意观察加载插件的时候, log会提示你加载了几个cookie
-    7. 尽量保证EdgeGPT模块是最新(pip install EdgeGPT --upgrade), 调用时报错请检查EdgeGPT是否最新, cookie是否有效, 是否做到了科学上网
-
+    7. 调用时报错请检查cookie是否有效, 是否做到了科学上网
 
     用法:
         1. bing + 内容, 和bing发起会话, 如果没有会新建会话.
         2. 重置bing, 重置bing的会话
 
     使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
-
-
+    tips: edgegpt库目前要求py3.10以上, 如果你是py3.9甚至3.8. 我这边用的查看到edgegpt 0.3.4.2可在python3.8.10内可用[pip uninstall EdgeGPT && pip install EdgeGPT==0.3.4.2]
 
 
 ## bing_or_openai_proxy的配置:
