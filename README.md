@@ -90,7 +90,7 @@
         2. 重置bing, 重置bing的会话
 
     使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
-    tips: edgegpt库目前要求py3.10以上, 如果你是py3.9甚至3.8. 我这边用的查看到edgegpt 0.3.4.2可在python3.8.10内可用[pip uninstall EdgeGPT && pip install EdgeGPT==0.3.4.2]
+    tips: edgegpt库目前要求py3.10以上, 如果你是py3.9甚至3.8. 我这边用的edgegpt 0.3.4.2在python3.8.10内可用  [pip uninstall EdgeGPT && pip install EdgeGPT==0.3.4.2]
 
 
 ## bing_or_openai_proxy的配置:
