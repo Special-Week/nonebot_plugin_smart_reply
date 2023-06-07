@@ -125,3 +125,11 @@ on_command(
     block=True,
     handlers=[openai.reserve_openai],
 )
+
+on_command(
+    "apikey_status",
+    aliases={"apikey用量", "apikey状态"},
+    priority=10,
+    block=True,
+    handlers=[openai.apikey_status],
+)

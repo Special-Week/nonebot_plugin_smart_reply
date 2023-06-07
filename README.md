@@ -126,4 +126,5 @@ on_command("重置bing", aliases={"重置会话", "bing重置", "会话重置"},
 # 使用openai的响应器
 on_command("openai",aliases={"求助"},block=True, priority=55, handlers=[openai.openai_handle])
 on_command("重置openai", aliases={"重置会话", "openai重置", "会话重置"}, priority=10, block=True, handlers=[openai.reserve_openai])
+on_command("apikey_status", aliases={"apikey用量", "apikey状态"}, priority=10, block=True, handlers=[openai.apikey_status])
 ```
