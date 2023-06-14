@@ -80,7 +80,7 @@ class Utils:
             ]
             logger.success(f"bing_cookies读取, 初始化成功, 共{len(self.bing_cookies)}个cookies")
         except Exception as e:
-            logger.error(f"读取bing cookies失败 error信息: {str(e)}")
+            logger.error(f"读取bing cookies失败 error信息: {repr(e)}")
             self.bing_cookies: list = []
         # ==================================== openai工具属性 ====================================================
         # 会话字典，用于存储会话   {"user_id": {"chatbot": bot, "last_time": time, "sessions_number": 0}}

@@ -69,7 +69,7 @@ class NewBing:
             utils.bing_chat_dict[uid]["isRunning"] = False
             await matcher.finish(
                 reply_msg + 
-                MessageSegment.text(f'askError: {str(e)}多次askError请尝试"重置bing"')
+                MessageSegment.text(f'askError: {repr(e)}多次askError请尝试"重置bing"')
             )
         utils.bing_chat_dict[uid]["isRunning"] = False  # 将当前会话状态设置为未运行
         if (
@@ -122,13 +122,13 @@ class NewBing:
             try:
                 await matcher.send(
                     reply_msg +
-                    MessageSegment.text(f"文本消息可能被风控了\n错误信息:{str(e)}\n这里咱尝试把文字写在图片上发送了") +
+                    MessageSegment.text(f"文本消息可能被风控了\n错误信息:{repr(e)}\n这里咱尝试把文字写在图片上发送了") +
                     MessageSegment.image(await utils.text_to_img(rep_message))
                 )
             except Exception as eeee:  # 如果还是失败, 我也没辙了, 只能返回异常信息了
                 await matcher.send(
                     reply_msg +
-                    MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{str(eeee)}")
+                    MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{repr(eeee)}")
                 )
 
 

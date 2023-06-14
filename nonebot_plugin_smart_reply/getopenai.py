@@ -81,7 +81,7 @@ class Openai:
             utils.openai_chat_dict[uid]["isRunning"] = False
             await matcher.finish(
                 reply_msg +
-                MessageSegment.text(f'askError: {str(e)}多次askError请尝试发送"重置openai"')
+                MessageSegment.text(f'askError: {repr(e)}多次askError请尝试发送"重置openai"')
             )
         utils.openai_chat_dict[uid]["isRunning"] = False  # 将当前会话状态设置为未运行
         sessions_number = utils.openai_chat_dict[uid]["sessions_number"]  # 获取当前会话的会话数
@@ -95,13 +95,13 @@ class Openai:
             try:
                 await matcher.send(
                     reply_msg + 
-                    MessageSegment.text(f"文本消息被风控了,错误信息:{str(e)}, 这里咱尝试把文字写在图片上发送了") +
+                    MessageSegment.text(f"文本消息被风控了,错误信息:{repr(e)}, 这里咱尝试把文字写在图片上发送了") +
                     MessageSegment.image(await utils.text_to_img(data))
                 )
             except Exception as eeee:
                 await matcher.send(
                     reply_msg + 
-                    MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{str(eeee)}")
+                    MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{repr(eeee)}")
                 )
 
     async def get_usage(
@@ -121,9 +121,9 @@ class Openai:
             date = datetime.fromtimestamp(int(expire_seconds))
             # 获取使用量
             total_usage = usage_result['total_usage'] / 100
-            return f"apikey:{apikey[:7] + '*******' + apikey[-4:]}\n实际已使用金额:{round(total_usage, 3)}\n总共金额:{round(total_usd, 3)}\n过期日期:{date.isoformat()}\n\n"
+            return f"apikey:{f'{apikey[:7]}*******{apikey[-4:]}'}\n实际已使用金额:{round(total_usage, 3)}\n总共金额:{round(total_usd, 3)}\n过期日期:{date.isoformat()}\n\n"
         except Exception as e:
-            return f"apikey:{apikey[:7] + '*******' + apikey[-4:]}\n获取使用量失败, 错误信息:{str(e)}\n\n"
+            return f"apikey:{f'{apikey[:7]}*******{apikey[-4:]}'}\n获取使用量失败, 错误信息:{repr(e)}\n\n"
         
         
     async def apikey_status(
