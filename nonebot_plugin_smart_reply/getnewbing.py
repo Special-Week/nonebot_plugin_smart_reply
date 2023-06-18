@@ -1,10 +1,16 @@
-from EdgeGPT import Chatbot
+from EdgeGPT.EdgeGPT import Chatbot
 from nonebot.adapters.onebot.v11 import (Message, MessageEvent, MessageSegment,
                                          PrivateMessageEvent)
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg
 
 from .utils import utils
+
+# 上游在犯病, 而我又需要用旧版本的EdgeGPT
+try:
+    from EdgeGPT.EdgeGPT import Chatbot
+except Exception:
+    from EdgeGPT import Chatbot  # type: ignore
 
 
 class NewBing:

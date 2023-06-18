@@ -5,7 +5,12 @@ import re
 from pathlib import Path
 from typing import Union
 
-from EdgeGPT import Chatbot as bingChatbot
+# 上游在犯病, 而我又需要用旧版本的EdgeGPT
+try:
+    from EdgeGPT.EdgeGPT import Chatbot as bingChatbot
+except Exception:
+    from EdgeGPT import Chatbot as bingChatbot  # type: ignore
+
 from loguru import logger
 from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment
 from nonebot.matcher import Matcher
