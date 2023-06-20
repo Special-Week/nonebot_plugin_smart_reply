@@ -1,7 +1,7 @@
+import contextlib
 import re
 
 from nonebot.permission import SUPERUSER
-from nonebot.plugin import PluginMetadata
 from nonebot.plugin.on import on_command, on_message, on_notice, on_regex
 from nonebot.rule import to_me
 
@@ -9,11 +9,12 @@ from .getnewbing import newbing
 from .getopenai import openai
 from .keywordhandle import key_word_module
 
-
-__plugin_meta__ = PluginMetadata(
-    name="smart_reply",
-    description="nonebot2的融合了openai, newbing, 词库的智障回复插件",
-    usage="""
+with contextlib.suppress(Exception):
+    from nonebot.plugin import PluginMetadata
+    __plugin_meta__ = PluginMetadata(
+        name="smart_reply",
+        description="nonebot2的融合了openai, newbing, 词库的智障回复插件",
+        usage="""
 openai [文本]  # 使用openai的api进行交互
 bing [文本]  # 使用new bing的api进行交互
 @bot [文本]  # 使用词库进行交互
@@ -26,17 +27,17 @@ bing [文本]  # 使用new bing的api进行交互
 重置openai  # 重置openai的会话
 重置会话  # 重置bing和openai的会话
 群内戳一戳bot  # 戳一戳bot触发
-""",
-    type="application",
-    homepage="https://github.com/Special-Week/nonebot_plugin_smart_reply",
-    supported_adapters={"~onebot.v11"},
-    extra={
-        'author':   'Special-Week',
-        'link':     'https://github.com/Special-Week/nonebot_plugin_smart_reply',
-        'version':  '0.0.37',
-        'priority': [1, 10, 11, 55, 999],
-    }
-)
+    """,
+        type="application",
+        homepage="https://github.com/Special-Week/nonebot_plugin_smart_reply",
+        supported_adapters={"~onebot.v11"},
+        extra={
+            'author':   'Special-Week',
+            'link':     'https://github.com/Special-Week/nonebot_plugin_smart_reply',
+            'version':  '0.0.37',
+            'priority': [1, 10, 11, 55, 999],
+        }
+    )
 
 
 
