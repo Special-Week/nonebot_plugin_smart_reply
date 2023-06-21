@@ -1,4 +1,3 @@
-from EdgeGPT.EdgeGPT import Chatbot
 from nonebot.adapters.onebot.v11 import (Message, MessageEvent, MessageSegment,
                                          PrivateMessageEvent)
 from nonebot.matcher import Matcher
