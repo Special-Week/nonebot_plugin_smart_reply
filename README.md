@@ -4,6 +4,8 @@
     
 ### 提醒, new bing与openai国内服务器需要科学上网才可调用, 希望你能熟练使用v2ray或clash或其他代理软件
 
+bing暂时寄了, 等等上游修一下websockets代理的问题
+
 
 ## 功能
 
