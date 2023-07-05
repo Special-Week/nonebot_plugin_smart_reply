@@ -34,7 +34,7 @@ class Config(BaseSettings):
         extra = "ignore"
 
 
-config = Config.parse_obj(get_driver().config)
+config: Config = Config.parse_obj(get_driver().config)
 
 
 if not config.smart_reply_path.exists() or not config.smart_reply_path.is_dir():

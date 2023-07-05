@@ -11,6 +11,7 @@ from .keywordhandle import key_word_module
 
 with contextlib.suppress(Exception):
     from nonebot.plugin import PluginMetadata
+
     __plugin_meta__ = PluginMetadata(
         name="smart_reply",
         description="nonebot2的融合了openai, newbing, 词库的智障回复插件",
@@ -32,13 +33,12 @@ bing [文本]  # 使用new bing的api进行交互
         homepage="https://github.com/Special-Week/nonebot_plugin_smart_reply",
         supported_adapters={"~onebot.v11"},
         extra={
-            'author':   'Special-Week',
-            'link':     'https://github.com/Special-Week/nonebot_plugin_smart_reply',
-            'version':  '0.0.37',
-            'priority': [1, 10, 11, 55, 999],
-        }
+            "author": "Special-Week",
+            "link": "https://github.com/Special-Week/nonebot_plugin_smart_reply",
+            "version": "0.0.37",
+            "priority": [1, 10, 11, 55, 999],
+        },
     )
-
 
 
 # 戳一戳响应器 优先级1, 不会向下阻断, 条件: 戳一戳bot触发
@@ -66,11 +66,11 @@ on_command(
 
 # 删除关键词响应器, 优先级11, 条件: 命令头
 on_command(
-    "删除关键词", 
+    "删除关键词",
     priority=11,
-    block=True, 
-    permission=SUPERUSER, 
-    handlers=[key_word_module.del_keyword_handle]
+    block=True,
+    permission=SUPERUSER,
+    handlers=[key_word_module.del_keyword_handle],
 )
 
 # 删除关键词的一个回复响应器, 优先级10, 条件: 正则表达式
@@ -83,7 +83,9 @@ on_regex(
 )
 
 # 普通回复响应器, 优先级999, 条件: 艾特bot就触发
-on_message(rule=to_me(), priority=999, block=False, handlers=[key_word_module.regular_reply])
+on_message(
+    rule=to_me(), priority=999, block=False, handlers=[key_word_module.regular_reply]
+)
 
 # 查看关键词响应器
 on_command(
@@ -97,11 +99,7 @@ on_command(
 
 # 使用bing的响应器
 on_command(
-    "bing", 
-    aliases={"newbing"},
-    priority=55, 
-    block=True, 
-    handlers=[newbing.bing_handle]
+    "bing", aliases={"newbing"}, priority=55, block=True, handlers=[newbing.bing_handle]
 )
 on_command(
     "重置bing",
