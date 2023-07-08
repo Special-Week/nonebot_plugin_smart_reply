@@ -68,6 +68,7 @@ class Utils:
         )
         self.audio_path: Path = self.module_path / "resource/audio"
         self.audio_list: List[str] = os.listdir(self.audio_path)
+        self.proxy = config.bing_or_openai_proxy
         # ==================================== bing工具属性 ====================================================
         # 会话字典，用于存储会话   {"user_id": {"chatbot": bot, "last_time": time, "model": "balanced", isRunning: bool}}
         self.bing_chat_dict: Dict = {}
@@ -92,8 +93,8 @@ class Utils:
         self.openai_max_tokens: int = config.openai_max_tokens
         self.max_sessions_number: int = config.openai_max_conversation
 
-        if config.bing_or_openai_proxy:
-            logger.info(f"已设置代理, 值为:{config.bing_or_openai_proxy}")
+        if self.proxy:
+            logger.info(f"已设置代理, 值为:{self.proxy}")
         else:
             logger.warning("未检测到代理，国内用户可能无法使用bing或openai功能")
 
@@ -114,7 +115,7 @@ class Utils:
                     )
                 )
         bot: bingChatbot = await bingChatbot.create(
-            cookies=random.choice(self.bing_cookies), proxy=config.bing_or_openai_proxy
+            cookies=random.choice(self.bing_cookies), proxy=self.proxy
         )  # 随机选择一个cookies创建一个Chatbot
         self.bing_chat_dict[user_id] = {
             "chatbot": bot,
@@ -150,7 +151,7 @@ class Utils:
         bot = openaiChatbot(
             api_key=random.choice(self.openai_api_key),
             max_tokens=self.openai_max_tokens,
-            proxy=config.bing_or_openai_proxy,
+            proxy=self.proxy,
         )  # 随机选择一个api_key创建一个Chatbot
         self.openai_chat_dict[user_id] = {
             "chatbot": bot,

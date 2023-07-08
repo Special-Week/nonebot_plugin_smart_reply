@@ -103,7 +103,7 @@ class Openai:
             "Authorization": f"Bearer {apikey}",
         }
         try:
-            async with AsyncClient() as client:
+            async with AsyncClient(proxies=utils.proxy) as client:
                 usage_result = (
                     await client.get(
                         self.host + self.usage_url, headers=headers, params=params
