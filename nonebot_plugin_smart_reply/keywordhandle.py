@@ -69,7 +69,7 @@ class KeyWordModule:
                 content: str = (resp["content"]).replace("{br}", "\n")
                 maybe_master = ["dn", "林欣", "贾彦娟", "周超辉", "鑫总", "张鑫", "1938877131"]
                 maybe_nickname = ["菲菲", "小燕"]
-                su = random.choice(utils.superuser)
+                su = random.choice(list(utils.superuser))
                 for i in maybe_master:
                     content = content.replace(i, su)
                 for i in maybe_nickname:
