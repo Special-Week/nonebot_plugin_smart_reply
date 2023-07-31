@@ -14,7 +14,7 @@ from nonebot.adapters.onebot.v11 import (
 )
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg, RegexGroup
-
+from httpx import AsyncClient
 from .utils import utils
 
 
@@ -36,6 +36,47 @@ class KeyWordModule:
         else:
             output: bytes = await utils.text_to_img(text=mes)  # 将文字转换为图片
             await matcher.finish(MessageSegment.image(output))
+
+    @staticmethod
+    def have_url(s: str) -> bool:
+        """判断传入的字符串中是否有url存在(我他娘的就不信这样还能输出广告?)"""
+        index = s.find(".")  # 找到.的下标
+        if index == -1:  # 如果没有.则返回False
+            return False
+        flag1 = ("\u0041" <= s[index - 1] <= "\u005a") or (
+            "\u0061" <= s[index - 1] <= "\u007a"
+        )  # 判断.前面的字符是否为字母
+        flag2 = ("\u0041" <= s[index + 1] <= "\u005a") or (
+            "\u0061" <= s[index + 1] <= "\u007a"
+        )  # 判断.后面的字符是否为字母
+        return flag1 and flag2
+
+    async def get_qinyunkeapi(self, ques: str) -> str:
+        async with AsyncClient() as client:
+            try:
+                resp = (
+                    await client.get(
+                        f"http://api.qingyunke.com/api.php?key=free&appid=0&msg={ques}"
+                    )
+                ).json()
+                if self.have_url(resp["content"]):
+                    if bool(utils.bing_cookies) and bool(utils.openai_api_key):
+                        return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"openai"/"bing"命令头调用openai或new bing吧吧'
+                    if bool(utils.openai_api_key):
+                        return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"openai"命令头调用openai吧'
+                    if bool(utils.bing_cookies):
+                        return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"bing"命令头调用new bing吧'
+                content: str = (resp["content"]).replace("{br}", "\n")
+                maybe_master = ["dn", "林欣", "贾彦娟", "周超辉", "鑫总", "张鑫", "1938877131"]
+                maybe_nickname = ["菲菲", "小燕"]
+                su = random.choice(utils.superuser)
+                for i in maybe_master:
+                    content = content.replace(i, su)
+                for i in maybe_nickname:
+                    content = content.replace(i, utils.bot_nickname)
+                return content
+            except Exception as e:
+                return f"调用api失败, 错误信息: {repr(e)}"
 
     @staticmethod
     async def del_akeyword_handle(
@@ -131,15 +172,9 @@ class KeyWordModule:
         result: Union[str, None] = await utils.get_chat_result(msg, nickname)
         # 如果词库没有结果，则调用api获取智能回复
         if result is None:
-            await matcher.finish(
-                MessageSegment.reply(event.message_id)
-                + MessageSegment.text(
-                    f'抱歉，{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"openai"/"bing"命令头调用openai或new bing吧'
-                )
-            )
-        await matcher.finish(
-            MessageSegment.reply(event.message_id) + MessageSegment.text(result)
-        )
+            result = await self.get_qinyunkeapi(msg)
+            await matcher.finish(MessageSegment.text(result), reply_message=True)
+        await matcher.finish(MessageSegment.text(result), reply_message=True)
 
 
 # 创建实例

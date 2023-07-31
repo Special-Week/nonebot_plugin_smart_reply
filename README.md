@@ -11,6 +11,7 @@
     艾特bot时回复一些基于词库的消息, 戳一戳回复特定的消息或者语音以及反戳
     接入了new bing的接口, 详情见下文
     接入了openai的接口, 详情见下文
+    接入了青云客的接口
 
 ## 词库添加关键词:
 	1、添加关键词 [text1] 答 [text2]		 
@@ -45,6 +46,7 @@
 |newbing_style    |str             |creative   |newbing_style = "creative"             |newbing的风格, "creative", "balanced", "precise", 三选一, 乱填报错我不管|
 
 .env完全不配置不影响插件运行, 但是部分功能会无法使用(openai, newbing)
+config这里会有一个读取superusers, 如果你env没有配置在su = random.choice(utils.superuser)这里应该会报错, 但我觉得你创建项目时应该就至少配置了一个的
 
 
 

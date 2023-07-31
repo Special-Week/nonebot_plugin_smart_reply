@@ -61,6 +61,7 @@ class Utils:
             "你好",
             "在",
         )
+        self.superuser = config.superusers
         self.module_path: Path = Path(__file__).parent
         self.keyword_path: Path = self.module_path / "resource/json/data.json"
         self.anime_thesaurus: Dict = json.load(

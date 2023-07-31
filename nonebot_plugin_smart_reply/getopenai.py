@@ -48,22 +48,23 @@ class Openai:
 
         if msg.isspace() or not msg:
             return  # 如果消息为空, 则不处理
-        reply_msg: MessageSegment = MessageSegment.reply(
-            event.message_id
-        )  # 回复消息的MessageSegment
         if msg in utils.nonsense:
             # 如果消息为空或者是一些无意义的问候, 则返回一些问候语
             await matcher.finish(
-                reply_msg + MessageSegment.text(await utils.rand_hello())
+                MessageSegment.text(await utils.rand_hello()), reply_message=True
             )
         if uid not in utils.openai_chat_dict:  # 如果用户id不在会话字典中, 则新建一个会话
             await utils.openai_new_chat(event=event, matcher=matcher)
-            await matcher.send(reply_msg + MessageSegment.text("openai新会话已创建"))
+            await matcher.send(MessageSegment.text("openai新会话已创建"), reply_message=True)
         if utils.openai_chat_dict[uid]["isRunning"]:  # 如果当前会话正在运行, 则返回正在运行
-            await matcher.finish(reply_msg + MessageSegment.text("当前会话正在运行中, 请稍后再发起请求"))
+            await matcher.finish(
+                MessageSegment.text("当前会话正在运行中, 请稍后再发起请求"), reply_message=True
+            )
         if utils.openai_chat_dict[uid]["sessions_number"] >= self.max_sessions_number:
             # 如果会话数超过最大会话数, 则返回会话数已达上限
-            await matcher.send(reply_msg + MessageSegment.text("会话数已达上限, 正在帮您请重置会话"))
+            await matcher.send(
+                MessageSegment.text("会话数已达上限, 正在帮您请重置会话"), reply_message=True
+            )
             await self.reserve_openai(matcher=matcher, event=event)
             return
         utils.openai_chat_dict[uid]["isRunning"] = True  # 将当前会话状态设置为运行中
@@ -75,8 +76,8 @@ class Openai:
         except Exception as e:  # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
             utils.openai_chat_dict[uid]["isRunning"] = False
             await matcher.finish(
-                reply_msg
-                + MessageSegment.text(f'askError: {repr(e)}多次askError请尝试发送"重置openai"')
+                MessageSegment.text(f'askError: {repr(e)}多次askError请尝试发送"重置openai"'),
+                reply_message=True,
             )
         utils.openai_chat_dict[uid]["isRunning"] = False  # 将当前会话状态设置为未运行
         sessions_number: int = utils.openai_chat_dict[uid][
@@ -84,17 +85,18 @@ class Openai:
         ]  # 获取当前会话的会话数
         data += f'\n\n当前: {sessions_number} 共{self.max_sessions_number}  \n字数异常请发送"重置openai"'
         try:
-            await matcher.send(reply_msg + MessageSegment.text(data))
+            await matcher.send(MessageSegment.text(data), reply_message=True)
         except Exception as e:
             try:
                 await matcher.send(
-                    reply_msg
-                    + MessageSegment.text(f"文本消息被风控了,错误信息:{repr(e)}, 这里咱尝试把文字写在图片上发送了")
-                    + MessageSegment.image(await utils.text_to_img(data))
+                    MessageSegment.text(f"文本消息被风控了,错误信息:{repr(e)}, 这里咱尝试把文字写在图片上发送了")
+                    + MessageSegment.image(await utils.text_to_img(data)),
+                    reply_message=True,
                 )
             except Exception as eeee:
                 await matcher.send(
-                    reply_msg + MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{repr(eeee)}")
+                    MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{repr(eeee)}"),
+                    reply_message=True,
                 )
 
     async def get_usage(self, params: dict, apikey: str) -> str:

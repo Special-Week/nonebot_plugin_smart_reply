@@ -40,18 +40,17 @@ class NewBing:
             await matcher.finish()
         if not self.cookie_allow:
             await matcher.finish("cookie未设置, 无法访问")
-        reply_msg: MessageSegment = MessageSegment.reply(
-            event.message_id
-        )  # 回复消息的MessageSegment
         if msg in utils.nonsense:
             await matcher.finish(
-                reply_msg + MessageSegment.text(await utils.rand_hello())
+                MessageSegment.text(await utils.rand_hello()), reply_message=True
             )
         if uid not in utils.bing_chat_dict:
             await utils.newbing_new_chat(event=event, matcher=matcher)
-            await matcher.send(reply_msg + MessageSegment.text("newbing新会话已创建"))
+            await matcher.send(MessageSegment.text("newbing新会话已创建"), reply_message=True)
         if utils.bing_chat_dict[uid]["isRunning"]:
-            await matcher.finish(reply_msg + MessageSegment.text("当前会话正在运行中, 请稍后再发起请求"))
+            await matcher.finish(
+                MessageSegment.text("当前会话正在运行中, 请稍后再发起请求"), reply_message=True
+            )
         utils.bing_chat_dict[uid]["isRunning"] = True
 
     async def bing_handle(
@@ -65,9 +64,7 @@ class NewBing:
 
         bot: Chatbot = utils.bing_chat_dict[uid]["chatbot"]  # 获取当前会话的Chatbot对象
         style: str = utils.bing_chat_dict[uid]["model"]  # 获取当前会话的对话样式
-        reply_msg: MessageSegment = MessageSegment.reply(
-            event.message_id
-        )  # 回复消息的MessageSegment
+
         try:  # 尝试获取bing的回复
             data: Dict[str, Any] = await bot.ask(
                 prompt=msg, conversation_style=self.style[style], simplify_response=True
@@ -75,15 +72,15 @@ class NewBing:
         except Exception as e:  # 如果出现异常, 则返回异常信息, 并且将当前会话状态设置为未运行
             utils.bing_chat_dict[uid]["isRunning"] = False
             await matcher.finish(
-                reply_msg
-                + MessageSegment.text(f'askError: {repr(e)}多次askError请尝试"重置bing"')
+                MessageSegment.text(f'askError: {repr(e)}多次askError请尝试"重置bing"'),
+                reply_message=True,
             )
 
         utils.bing_chat_dict[uid]["isRunning"] = False  # 将当前会话状态设置为未运行
         utils.bing_chat_dict[uid]["sessions_number"] += 1  # 会话数+1
         if "text" not in data:
             await matcher.finish(
-                reply_msg + MessageSegment.text("bing没有返回text, 请重试")
+                MessageSegment.text("bing没有返回text, 请重试"), reply_message=True
             )
         current_conversation: int = utils.bing_chat_dict[uid]["sessions_number"]
         max_conversation: int = data["messages_left"] + current_conversation
@@ -92,13 +89,15 @@ class NewBing:
 
         try:  # 尝试发送回复
             await matcher.send(
-                reply_msg
-                + MessageSegment.text(
+                MessageSegment.text(
                     f"{rep_message}\n\n当前{current_conversation} 共 {max_conversation}"
-                )
+                ),
+                reply_message=True,
             )
             if max_conversation <= current_conversation:
-                await matcher.send(reply_msg + MessageSegment.text("达到对话上限, 正帮你重置会话"))
+                await matcher.send(
+                    MessageSegment.text("达到对话上限, 正帮你重置会话"), reply_message=True
+                )
                 try:
                     await utils.newbing_new_chat(event=event, matcher=matcher)
                 except Exception:
@@ -106,15 +105,14 @@ class NewBing:
         except Exception as e:  # 如果发送失败, 则尝试把文字写在图片上发送
             try:
                 await matcher.send(
-                    reply_msg
-                    + MessageSegment.text(
-                        f"文本消息可能被风控了\n错误信息:{repr(e)}\n这里咱尝试把文字写在图片上发送了"
-                    )
-                    + MessageSegment.image(await utils.text_to_img(rep_message))
+                    MessageSegment.text(f"文本消息可能被风控了\n错误信息:{repr(e)}\n这里咱尝试把文字写在图片上发送了")
+                    + MessageSegment.image(await utils.text_to_img(rep_message)),
+                    reply_message=True,
                 )
             except Exception as eeee:  # 如果还是失败, 我也没辙了, 只能返回异常信息了
                 await matcher.send(
-                    reply_msg + MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{repr(eeee)}")
+                    MessageSegment.text(f"消息全被风控了, 这是捕获的异常: \n{repr(eeee)}"),
+                    reply_message=True,
                 )
 
 

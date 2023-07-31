@@ -17,7 +17,7 @@ class Config(BaseSettings):
     newbing_cd_time: int = 600
     newbing_style: str = "creative"
     bing_or_openai_proxy: str = ""
-    superusers: Optional[Sequence[str]] = []
+    superusers: Sequence[str] = []
 
     @validator("openai_api_key")
     def _check_openai_api_key(cls, v):
