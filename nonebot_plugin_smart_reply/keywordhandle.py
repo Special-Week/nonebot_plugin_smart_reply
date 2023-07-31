@@ -66,6 +66,7 @@ class KeyWordModule:
                         return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"openai"命令头调用openai吧'
                     if bool(utils.bing_cookies):
                         return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"bing"命令头调用new bing吧'
+                    return f"这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 换个话题吧"
                 content: str = (resp["content"]).replace("{br}", "\n")
                 maybe_master = ["dn", "林欣", "贾彦娟", "周超辉", "鑫总", "张鑫", "1938877131"]
                 maybe_nickname = ["菲菲", "小燕"]

@@ -1,6 +1,6 @@
 [project]
 name = "nonebot_plugin_smart_reply"
-version = "0.02.114514"
+version = "0.04.114514"
 description = "nonebot2的融合了openai, newbing, 词库的智障回复插件"
 authors = [
     {name = "Special-Week", email = "HuaMing27499@gmail.com"},
