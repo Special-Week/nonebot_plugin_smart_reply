@@ -156,9 +156,7 @@ class KeyWordModule:
         if not self.reply_private and isinstance(event, PrivateMessageEvent):
             return
         # 获取消息文本
-        msg = str(event.get_message())
-        # 去掉带中括号的内容(去除cq码)
-        msg: str = re.sub(r"\[.*?\]", "", msg)
+        msg = event.get_message().extract_plain_text()
         # 如果是光艾特bot(没消息返回)或者打招呼的话,就回复以下内容
         if (not msg) or msg.isspace() or msg in utils.nonsense:
             await matcher.finish(MessageSegment.text(await utils.rand_hello()))

@@ -35,7 +35,7 @@ bing [文本]  # 使用new bing的api进行交互
         extra={
             "author": "Special-Week",
             "link": "https://github.com/Special-Week/nonebot_plugin_smart_reply",
-            "version": "0.04.114514",
+            "version": "0.05.114514",
             "priority": [1, 10, 11, 55, 999],
         },
     )
