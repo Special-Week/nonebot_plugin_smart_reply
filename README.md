@@ -93,15 +93,14 @@ config这里会有一个读取superusers, 如果你env没有配置在su = random
         2. 重置bing, 重置bing的会话
 
     使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
-    tips: 根据这条[issue](https://github.com/acheong08/EdgeGPT/issues/584)，中国大陆服务器你也许edgeGPT 0.10.16才能使用
 
 
 ## bing_or_openai_proxy的配置:
 
     1. 你需要使用v2ray或者clash等代理工具开启本地监听端口
-    2. 根据http和socks5的不同, 配置不同, 
-    3. 以v2rayN举例, 本地监听端口1080, 你应该配置成"socks5://127.0.0.1:1080"或者"http://127.0.0.1:1081"
-    4. 以clash for windows举例, 本地监听端口7890, 你应该配置成"socks5://127.0.0.1:7890"或者"http://127.0.0.1:7890"
+    2. 由于httpx的陈年老bug, socks5代理应该用不了, 请使用http代理 
+    3. 以v2rayN举例, 本地监听端口1080, 你应该配置成"http://127.0.0.1:1081"(http = socks5 + 1)
+    4. 以clash for windows举例, 本地监听端口7890, 你应该配置成"http://127.0.0.1:7890"
 
 
 
