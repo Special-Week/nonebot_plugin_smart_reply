@@ -1,9 +1,9 @@
 import json
 import random
-import re
 from pathlib import Path
 from typing import Tuple, Union
 
+from httpx import AsyncClient
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     Message,
@@ -14,7 +14,7 @@ from nonebot.adapters.onebot.v11 import (
 )
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg, RegexGroup
-from httpx import AsyncClient
+
 from .utils import utils
 
 
@@ -32,7 +32,9 @@ class KeyWordModule:
             await matcher.finish("check失败, 你要输入关键词哦")
         mes: str = await utils.check_word(key)
         if mes == "寄":
-            await matcher.finish("抱歉没有记过这个关键词捏，请输入[查询所有关键词]来获取全部关键词")
+            await matcher.finish(
+                "抱歉没有记过这个关键词捏，请输入[查询所有关键词]来获取全部关键词"
+            )
         else:
             output: bytes = await utils.text_to_img(text=mes)  # 将文字转换为图片
             await matcher.finish(MessageSegment.image(output))
@@ -60,15 +62,19 @@ class KeyWordModule:
                     )
                 ).json()
                 if self.have_url(resp["content"]):
-                    if bool(utils.bing_cookies) and bool(utils.openai_api_key):
-                        return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"openai"/"bing"命令头调用openai或new bing吧吧'
                     if bool(utils.openai_api_key):
                         return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"openai"命令头调用openai吧'
-                    if bool(utils.bing_cookies):
-                        return f'这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 试试使用"bing"命令头调用new bing吧'
                     return f"这个问题{utils.bot_nickname}暂时不知道怎么回答你呢, 换个话题吧"
                 content: str = (resp["content"]).replace("{br}", "\n")
-                maybe_master = ["dn", "林欣", "贾彦娟", "周超辉", "鑫总", "张鑫", "1938877131"]
+                maybe_master = [
+                    "dn",
+                    "林欣",
+                    "贾彦娟",
+                    "周超辉",
+                    "鑫总",
+                    "张鑫",
+                    "1938877131",
+                ]
                 maybe_nickname = ["菲菲", "小燕"]
                 su = random.choice(list(utils.superuser))
                 for i in maybe_master:
@@ -82,7 +88,7 @@ class KeyWordModule:
     @staticmethod
     async def del_akeyword_handle(
         matcher: Matcher,
-        matched: Tuple[str, int] = RegexGroup(),
+        matched: Tuple[str, int] = RegexGroup(),  # type: ignore
     ) -> None:
         """删除关键词, 通过序号删除或者通过关键词删除"""
         word1, word2 = matched

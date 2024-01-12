@@ -5,7 +5,6 @@ from nonebot.permission import SUPERUSER
 from nonebot.plugin.on import on_command, on_message, on_notice, on_regex
 from nonebot.rule import to_me
 
-from .getnewbing import newbing
 from .getopenai import openai
 from .keywordhandle import key_word_module
 
@@ -17,14 +16,12 @@ with contextlib.suppress(Exception):
         description="nonebot2的融合了openai, newbing, 词库的智障回复插件",
         usage="""
 openai [文本]  # 使用openai的api进行交互
-bing [文本]  # 使用new bing的api进行交互
 @bot [文本]  # 使用词库进行交互
 添加关键词 [关键词] 答 [回复]  # 添加自带词库的关键词
 删除关键词 [关键词]  # 删除自带词库的关键词
 删除关键词 [关键词] 删 [回复]  # 删除自带词库的关键词的一个回复
 查看所有关键词  # 查看自带词库的所有关键词
 查看关键词 [关键词]  # 查看自带词库的关键词的所有回复
-重置bing  # 重置bing的会话
 重置openai  # 重置openai的会话
 重置会话  # 重置bing和openai的会话
 群内戳一戳bot  # 戳一戳bot触发
@@ -35,7 +32,7 @@ bing [文本]  # 使用new bing的api进行交互
         extra={
             "author": "Special-Week",
             "link": "https://github.com/Special-Week/nonebot_plugin_smart_reply",
-            "version": "0.06.114514",
+            "version": "0.07.114514",
             "priority": [1, 10, 11, 55, 999],
         },
     )
@@ -97,17 +94,6 @@ on_command(
     handlers=[key_word_module.check_keyword_handle],
 )
 
-# 使用bing的响应器
-on_command(
-    "bing", aliases={"newbing"}, priority=55, block=True, handlers=[newbing.bing_handle]
-)
-on_command(
-    "重置bing",
-    aliases={"重置会话", "bing重置", "会话重置"},
-    priority=10,
-    block=True,
-    handlers=[newbing.reserve_bing],
-)
 
 # 使用openai的响应器
 on_command(
@@ -123,12 +109,4 @@ on_command(
     priority=10,
     block=True,
     handlers=[openai.reserve_openai],
-)
-
-on_command(
-    "apikey_status",
-    aliases={"apikey用量", "apikey状态"},
-    priority=10,
-    block=True,
-    handlers=[openai.apikey_status],
 )

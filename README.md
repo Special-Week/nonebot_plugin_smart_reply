@@ -1,16 +1,15 @@
 # nonebot2智能(障)回复插件
 
-    问问提前请务必看完readme, 这是一个融合了openai, newbing, 词库的智障回复插件
+    问问提前请务必看完readme, 这是一个融合了openai, 词库的智障回复插件
     
-### 提醒, new bing与openai国内服务器需要科学上网才可调用, 希望你能熟练使用v2ray或clash或其他代理软件
+### 提醒, openai国内服务器需要科学上网才可调用, 希望你能熟练使用v2ray或clash或其他代理软件
 
 
 
 ## 功能
 
     艾特bot时回复一些基于词库的消息, 戳一戳回复特定的消息或者语音以及反戳
-    接入了new bing的接口, 详情见下文
-    接入了openai的接口, 详情见下文
+    接入了openai apikey的接口, 详情见下文
     接入了青云客的接口
 
 ## 词库添加关键词:
@@ -41,11 +40,10 @@
 | openai_max_tokens | int     |1000      |openai_max_tokens = 1500         |    openai的max_tokens, 详细请看下文     |
 | openai_cd_time    | int     |600        |openai_cd_time = 114             |    openai创建会话的cd                       |
 | openai_max_conversation|int|10|openai_max_conversation = 10|openai的单个会话点最大交互数量|
-| newbing_cd_time    | int     |600        |newbing_cd_time = 114             |    newbing创建会话的cd                       |
-|bing_or_openai_proxy|str       |""         |bing_or_openai_proxy = "http://127.0.0.1:1081" |    openai或者newbing的代理, 配置详细请看下文|        
-|newbing_style    |str             |creative   |newbing_style = "creative"             |newbing的风格, "creative", "balanced", "precise", 三选一, 乱填报错我不管|
+|openai_proxy|str       |""         |openai_proxy = "http://127.0.0.1:1081" |    openai或者newbing的代理, 配置详细请看下文|        
 
-.env完全不配置不影响插件运行, 但是部分功能会无法使用(openai, newbing)
+
+.env完全不配置不影响插件运行, 但是部分功能会无法使用(openai)
 config这里会有一个读取superusers, 如果你env没有配置在su = random.choice(utils.superuser)这里应该会报错, 但我觉得你创建项目时应该就至少配置了一个的
 
 
@@ -77,25 +75,9 @@ config这里会有一个读取superusers, 如果你env没有配置在su = random
 
 
 
-## 关于new bing的配置:
-
-    0. 也许需要科学上网, 代理配置详细请看下文
-    1. 使用功能必须配置cookie, 否则无法使用, 这个cookie内容过多不适合在.env, 所以这个cookie将会与json文件的形式进行配置
-    2. 首先你需要一个通过申请的账号, 使用edge浏览器安装"editthiscookie"浏览器插件, 或者使用相关的其他插件获取cookie. 进入"bing.com/chat"登录通过的账号
-    3. 先随便交互点内容(不交互可能会出现User needs to solve CAPTCHA to continue)再右键界面选择"editthiscookie", 找到一个看上去像出门的样子的图标"导出cookie", cookie一般就能在你的剪贴板, 注意了, cookie导出来是一个list, 大概长这样[{},{},{}]
-    4. 新建cookiexxx.json文件(xxx为任意合法字符), 把你剪贴板的cookie的字符串粘贴进去, 再次强调json大概长[{},{},{}]这样
-    5. 打开你bot项目文件夹, 依次进入data/smart_reply, 没有就新建, 把json文件丢进去, 有几个账号可以放几个, 要求cookie开头, .json结尾, 载入插件时初始化会全部读取, 创建会话的时候会通过random来选择一个账号的cookie
-    6. 注意观察加载插件的时候, log会提示你加载了几个cookie
-    7. 调用时报错请检查cookie是否有效, 是否做到了科学上网
-
-    用法:
-        1. bing + 内容, 和bing发起会话, 如果没有会新建会话.
-        2. 重置bing, 重置bing的会话
-
-    使用了与Bing通讯的接口 [EdgeGPT](https://github.com/acheong08/EdgeGPT)        
 
 
-## bing_or_openai_proxy的配置:
+## bopenai_proxy的配置:
 
     1. 你需要使用v2ray或者clash等代理工具开启本地监听端口
     2. 由于httpx的陈年老bug, socks5代理应该用不了, 请使用http代理 
@@ -122,11 +104,7 @@ on_regex(r"^删除关键词\s*(\S+.*?)\s*删\s*(\S+.*?)\s*$", flags=re.S, priori
 on_message(rule=to_me(), priority=999, block=False, handlers=[key_word_module.regular_reply])
 # 查看关键词响应器
 on_command("查看关键词", aliases={"查询关键词"}, priority=11, block=True, permission=SUPERUSER, handlers=[key_word_module.check_keyword_handle])
-# 使用bing的响应器
-on_command("bing", priority=55, block=True, handlers=[newbing.bing_handle])
-on_command("重置bing", aliases={"重置会话", "bing重置", "会话重置"}, priority=10, block=True, handlers=[newbing.reserve_bing])
 # 使用openai的响应器
 on_command("openai",aliases={"求助"},block=True, priority=55, handlers=[openai.openai_handle])
 on_command("重置openai", aliases={"重置会话", "openai重置", "会话重置"}, priority=10, block=True, handlers=[openai.reserve_openai])
-on_command("apikey_status", aliases={"apikey用量", "apikey状态"}, priority=10, block=True, handlers=[openai.apikey_status])
 ```

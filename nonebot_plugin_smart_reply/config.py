@@ -14,9 +14,7 @@ class Config(BaseSettings):
     openai_max_tokens: int = 1000
     openai_cd_time: int = 600
     openai_max_conversation: int = 10
-    newbing_cd_time: int = 600
-    newbing_style: str = "creative"
-    bing_or_openai_proxy: str = ""
+    openai_proxy: str = ""
     superusers: Sequence[str] = []
 
     @validator("openai_api_key")

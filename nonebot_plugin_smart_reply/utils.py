@@ -1,11 +1,9 @@
 import json
 import os
 import random
-import re
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
-from EdgeGPT.EdgeGPT import Chatbot as bingChatbot
 from loguru import logger
 from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment
 from nonebot.matcher import Matcher
@@ -69,24 +67,7 @@ class Utils:
         )
         self.audio_path: Path = self.module_path / "resource/audio"
         self.audio_list: List[str] = os.listdir(self.audio_path)
-        self.proxy = config.bing_or_openai_proxy
-        # ==================================== bing工具属性 ====================================================
-        # 会话字典，用于存储会话   {"user_id": {"chatbot": bot, "last_time": time, "model": "balanced", isRunning: bool}}
-        self.bing_chat_dict: Dict = {}
-        bing_cookies_files: List[Path] = [
-            file
-            for file in config.smart_reply_path.rglob("*.json")
-            if file.stem.startswith("cookie")
-        ]
-        try:
-            self.bing_cookies: List = [
-                json.load(open(file, "r", encoding="utf-8"))
-                for file in bing_cookies_files
-            ]
-            logger.success(f"bing_cookies读取, 初始化成功, 共{len(self.bing_cookies)}个cookies")
-        except Exception as e:
-            logger.error(f"读取bing cookies失败 error信息: {repr(e)}")
-            self.bing_cookies: List = []
+        self.proxy = config.openai_proxy
         # ==================================== openai工具属性 ====================================================
         # 会话字典，用于存储会话   {"user_id": {"chatbot": bot, "last_time": time, "sessions_number": 0}}
         self.openai_chat_dict: dict = {}
@@ -100,40 +81,7 @@ class Utils:
             logger.warning("未检测到代理，国内用户可能无法使用bing或openai功能")
 
     # ================================================================================================
-    async def newbing_new_chat(self, event: MessageEvent, matcher: Matcher) -> None:
-        """重置会话"""
-        current_time: int = event.time
-        user_id: str = str(event.user_id)
-        if user_id in self.bing_chat_dict:
-            last_time: int = self.bing_chat_dict[user_id]["last_time"]
-            if (current_time - last_time < config.newbing_cd_time) and (
-                event.get_user_id() not in config.superusers
-            ):  # 如果当前时间减去上一次时间小于CD时间, 直接返回 # type: ignore
-                await matcher.finish(
-                    MessageSegment.reply(event.message_id)
-                    + MessageSegment.text(
-                        f"非报错情况下每个会话需要{config.newbing_cd_time}秒才能新建哦, 当前还需要{config.newbing_cd_time - (current_time - last_time)}秒"
-                    )
-                )
-        bot: bingChatbot = await bingChatbot.create(
-            cookies=random.choice(self.bing_cookies), proxy=self.proxy
-        )  # 随机选择一个cookies创建一个Chatbot
-        self.bing_chat_dict[user_id] = {
-            "chatbot": bot,
-            "last_time": current_time,
-            "model": config.newbing_style,
-            "sessions_number": 0,
-            "isRunning": False,
-        }
 
-    @staticmethod
-    async def bing_string_handle(input_string: str) -> str:
-        """处理一下bing返回的字符串"""
-        return re.sub(r'\[\^(\d+)\^]',  r'[\1]', input_string)
-
-    # ================================================================================================
-
-    # ================================================================================================
     async def openai_new_chat(self, event: MessageEvent, matcher: Matcher) -> None:
         """重置会话"""
         current_time: int = event.time  # 获取当前时间
