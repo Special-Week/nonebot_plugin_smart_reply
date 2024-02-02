@@ -2,6 +2,7 @@ import json
 import random
 from pathlib import Path
 from typing import Tuple, Union
+from urllib.parse import quote
 
 from httpx import AsyncClient
 from nonebot.adapters.onebot.v11 import (
@@ -58,7 +59,7 @@ class KeyWordModule:
             try:
                 resp = (
                     await client.get(
-                        f"http://api.qingyunke.com/api.php?key=free&appid=0&msg={ques}"
+                        f"http://api.qingyunke.com/api.php?key=free&appid=0&msg={quote(ques)}"
                     )
                 ).json()
                 if self.have_url(resp["content"]):

@@ -23,7 +23,6 @@ openai [文本]  # 使用openai的api进行交互
 查看所有关键词  # 查看自带词库的所有关键词
 查看关键词 [关键词]  # 查看自带词库的关键词的所有回复
 重置openai  # 重置openai的会话
-重置会话  # 重置bing和openai的会话
 群内戳一戳bot  # 戳一戳bot触发
     """,
         type="application",
@@ -32,7 +31,7 @@ openai [文本]  # 使用openai的api进行交互
         extra={
             "author": "Special-Week",
             "link": "https://github.com/Special-Week/nonebot_plugin_smart_reply",
-            "version": "0.07.114514",
+            "version": "0.08.114514",
             "priority": [1, 10, 11, 55, 999],
         },
     )
