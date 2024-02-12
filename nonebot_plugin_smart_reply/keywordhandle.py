@@ -143,11 +143,10 @@ class KeyWordModule:
             if probability < 0.33:
                 # 发送语音需要配置ffmpeg, 这里try一下, 不行就随机回复poke__reply的内容
                 try:
-                    await matcher.send(
-                        MessageSegment.record(
-                            Path(utils.audio_path) / random.choice(utils.audio_list)
-                        )
-                    )
+                    with open(
+                        Path(utils.audio_path) / random.choice(utils.audio_list), "rb"
+                    ) as f:
+                        await matcher.send(MessageSegment.record(f.read()))
                 except Exception:
                     await matcher.send(await utils.rand_poke())
             elif probability > 0.66:
