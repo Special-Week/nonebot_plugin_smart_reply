@@ -143,15 +143,14 @@ class KeyWordModule:
             if probability < 0.33:
                 # 发送语音需要配置ffmpeg, 这里try一下, 不行就随机回复poke__reply的内容
                 try:
-                    with open(
-                        Path(utils.audio_path) / random.choice(utils.audio_list), "rb"
-                    ) as f:
-                        await matcher.send(MessageSegment.record(f.read()))
+                    record = Path(utils.audio_path) / random.choice(utils.audio_list)
+                    await matcher.send(MessageSegment.record(record.read_bytes()))
                 except Exception:
                     await matcher.send(await utils.rand_poke())
             elif probability > 0.66:
                 # 33% 概率戳回去
                 await matcher.send(Message(f"[CQ:poke,qq={event.user_id}]"))
+                # await matcher.send(Message(f"[CQ:touch,id={event.user_id}]"))     # shamrock写法
             # probability在0.33和0.66之间的概率回复poke__reply的内容
             else:
                 await matcher.send(await utils.rand_poke())
