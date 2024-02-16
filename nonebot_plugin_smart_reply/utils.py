@@ -123,12 +123,12 @@ class Utils:
     async def get_chat_result(self, text: str, nickname: str) -> Union[str, None]:
         """从字典中返回结果"""
         if len(text) < 7:
+            result: List[str] = []
             keys = self.anime_thesaurus.keys()
             for key in keys:
                 if key in text:
-                    return random.choice(self.anime_thesaurus[key]).replace(
-                        "你", nickname
-                    )
+                    result += self.anime_thesaurus[key]
+            return random.choice(result).replace("你", nickname)
 
     async def add_word(self, word1: str, word2: str) -> Union[str, None]:
         """添加词条"""

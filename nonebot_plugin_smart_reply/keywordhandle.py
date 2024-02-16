@@ -149,8 +149,8 @@ class KeyWordModule:
                     await matcher.send(await utils.rand_poke())
             elif probability > 0.66:
                 # 33% 概率戳回去
-                await matcher.send(Message(f"[CQ:poke,qq={event.user_id}]"))
-                # await matcher.send(Message(f"[CQ:touch,id={event.user_id}]"))     # shamrock写法
+                await matcher.send(MessageSegment("poke", {"qq": event.user_id}))
+                # await matcher.send(MessageSegment("touch", {"id": event.user_id}))     # shamrock写法
             # probability在0.33和0.66之间的概率回复poke__reply的内容
             else:
                 await matcher.send(await utils.rand_poke())
