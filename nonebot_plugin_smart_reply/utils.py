@@ -128,7 +128,8 @@ class Utils:
             for key in keys:
                 if key in text:
                     result += self.anime_thesaurus[key]
-            return random.choice(result).replace("你", nickname)
+
+            return random.choice(result).replace("你", nickname) if result else None
 
     async def add_word(self, word1: str, word2: str) -> Union[str, None]:
         """添加词条"""
