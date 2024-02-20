@@ -3,10 +3,10 @@ from typing import Optional, Sequence
 
 from nonebot import get_driver
 from nonebot.log import logger
-from pydantic import BaseSettings, validator
+from pydantic import BaseModel, parse_obj_as, validator
 
 
-class Config(BaseSettings):
+class Config(BaseModel):
     bot_nickname: str = "我"
     smart_reply_path: Path = Path("data/smart_reply")
     ai_reply_private: bool = False
@@ -32,7 +32,7 @@ class Config(BaseSettings):
         extra = "ignore"
 
 
-config: Config = Config.parse_obj(get_driver().config)
+config = parse_obj_as(Config, get_driver().config.dict())
 
 
 if not config.smart_reply_path.exists() or not config.smart_reply_path.is_dir():
