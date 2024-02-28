@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Set, Union
 
 from nonebot import get_driver
 from nonebot.log import logger
@@ -10,12 +10,12 @@ class Config(BaseModel):
     bot_nickname: str = "我"
     smart_reply_path: Path = Path("data/smart_reply")
     ai_reply_private: bool = False
-    openai_api_key: Optional[Sequence[str]]
+    openai_api_key: Optional[Union[Sequence[str], str]] = None
     openai_max_tokens: int = 1000
     openai_cd_time: int = 600
     openai_max_conversation: int = 10
     openai_proxy: str = ""
-    superusers: Sequence[str] = []
+    superusers: Set[str]
 
     @validator("openai_api_key")
     def _check_openai_api_key(cls, v):
